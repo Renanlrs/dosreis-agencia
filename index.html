@@ -80,6 +80,18 @@
   .hero .sub{position:relative;z-index:4;max-width:560px;margin:20px auto 0}
   .hero .actions{position:relative;z-index:4;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
   .hero .phone{height:min(40svh,368px);width:auto}
+  /* --- Elva-like: titulo gigante ATRAS do aparelho + lente de vidro --- */
+  @media(min-width:1000px){
+    .hero-in{padding-top:clamp(30px,7vh,86px)}
+    .hero h1{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:1;width:min(1240px,94vw);margin:0;
+      pointer-events:none;font-size:clamp(50px,6.6vw,100px);
+      text-shadow:0 0 70px rgba(124,255,57,.22),1.6px 0 0 rgba(0,229,255,.14),-1.6px 0 0 rgba(255,0,170,.12)}
+    .hero .stage{margin-top:clamp(6px,1.6vh,22px)}
+    .hero .phone{height:min(54svh,545px)}
+    .hero .scr{justify-content:center;gap:10px}
+    .hero .glass{inset:-40px;border-radius:calc(clamp(32px,3.4vw,44px) + 40px);
+      backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2)}
+  }
   @media(max-width:760px){
     .hero h1{margin-bottom:14px}
     .hero .phone{height:min(38svh,330px)}
