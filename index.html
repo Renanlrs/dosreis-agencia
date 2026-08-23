@@ -76,13 +76,6 @@
     background:radial-gradient(closest-side,rgba(124,255,57,.16),transparent 68%);filter:blur(20px);animation:breathe 9s ease-in-out infinite alternate;pointer-events:none}
   @keyframes breathe{from{opacity:.6;transform:translate(-50%,-50%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1.07)}}
   .hero-in{position:relative;display:grid;justify-items:center}
-  .hero .hero-me{position:absolute;left:max(6px,calc(50% - 720px));bottom:0;z-index:1;
-    height:min(60vh,580px);width:auto;pointer-events:none;
-    filter:drop-shadow(0 30px 60px rgba(0,0,0,.85));
-    -webkit-mask:linear-gradient(#000 78%,transparent);mask:linear-gradient(#000 78%,transparent);
-    animation:mefade 1.1s var(--ease) both .35s}
-  @keyframes mefade{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
-  @media(max-width:1280px){.hero .hero-me{display:none}}
   .hero h1{position:relative;z-index:2;margin-bottom:clamp(10px,2vh,22px);max-width:min(1100px,94vw)}
   .hero .sub{position:relative;z-index:4;max-width:560px;margin:20px auto 0}
   .hero .actions{position:relative;z-index:4;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
@@ -739,7 +732,6 @@
 <!-- ================= HERO ================= -->
 <section class="hero" id="top">
   <div class="halo"></div>
-  <img class="hero-me" src="assets/img/mkt/renan-aponta.webp" alt="Renan, fundador da DOS REIS">
   <div class="hero-in">
     <h1 class="display" data-split><span class="thin">Sua marca com</span> <span class="gl">cara de gente grande.</span></h1>
 
