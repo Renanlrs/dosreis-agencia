@@ -616,6 +616,8 @@
          display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(26px,5vw,62px);align-items:center}
   @media(max-width:860px){.split{grid-template-columns:1fr}}
   .split .pic{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line);aspect-ratio:4/3}
+  .split .pic.tallpic{aspect-ratio:4/5}
+  .split .pic.tallpic img{object-position:center 18%}
   .split .pic img{width:100%;height:100%;object-fit:cover;opacity:.92;transition:.8s var(--ease)}
   .split .pic:hover img{transform:scale(1.05)}
   .split .pic::after{content:"";position:absolute;inset:0;background:linear-gradient(200deg,transparent 40%,rgba(0,0,0,.7))}
@@ -881,7 +883,7 @@
   </div>
 
   <div class="grid">
-    <div class="svc tall rv"><img src="assets/img/site.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc tall rv"><img src="assets/img/conceito/13-celular-gigante.jpg" alt="" loading="lazy"><div class="in">
       <span class="n">01</span><h3>Sites profissionais</h3>
       <p>Sua empresa com endereço próprio na internet: rápido, bonito no celular e com botão direto pro WhatsApp.</p></div></div>
 
@@ -897,7 +899,7 @@
       <span class="n">04</span><h3>Convites digitais</h3>
       <p>Aniversário, casamento, chá de bebê: convite animado, com confirmação de presença e link pra mandar no zap.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/artes.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/conceito/07-multi-bracos.jpg" alt="" loading="lazy"><div class="in">
       <span class="n">05</span><h3>Criativos e artes</h3>
       <p>Post, story, promoção, cardápio impresso, banner. Sua marca falando a mesma língua em todo lugar.</p></div></div>
 
@@ -909,7 +911,7 @@
       <span class="n">07</span><h3>Contrato de prestação de serviço</h3>
       <p>Modelo pronto pro seu tipo de trabalho, com prazo, valor e garantia claros. Você cobra melhor quando está protegido.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/trafego.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/conceito/09-outdoor-gigante.jpg" alt="" loading="lazy"><div class="in">
       <span class="n">08</span><h3>Tráfego pago</h3>
       <p>Meta e Google Ads configurados, acompanhados e ajustados. Você define quanto investir por dia — e vê o retorno.</p></div></div>
 
@@ -917,15 +919,15 @@
       <span class="n">09</span><h3>Google Meu Negócio</h3>
       <p>Perfil completo no Maps com fotos, horário e avaliações, pra aparecer primeiro na busca da sua região.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/mentoria.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/conceito/03-cabeca-aberta.jpg" alt="" loading="lazy"><div class="in">
       <span class="n">10</span><h3>Mentoria para MEI</h3>
       <p>Preço, oferta, atendimento e organização. A gente senta com você e monta o plano do próximo trimestre.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/criativo.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/conceito/05-action-figure.jpg" alt="" loading="lazy"><div class="in">
       <span class="n">11</span><h3>Identidade visual</h3>
       <p>Logo, cores, tipografia e aplicação. Sua marca reconhecível na fachada, no post e na embalagem.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/redes.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/conceito/02-social-media-icones.jpg" alt="" loading="lazy"><div class="in">
       <span class="n">12</span><h3>Gestão de redes</h3>
       <p>Calendário, conteúdo e resposta. Seu perfil vivo, mesmo na semana em que você não tem tempo pra nada.</p></div></div>
   </div>
@@ -1177,6 +1179,28 @@ Tiago Ferreira</textarea>
   </div>
 </section>
 
+<!-- ================= CONCEITUAIS ================= -->
+<section class="show">
+  <div class="wrap" style="padding-bottom:26px">
+    <div class="head rv" style="margin-bottom:0">
+      <span class="kicker">Criativo de verdade</span>
+      <h2 class="display">Anúncio que <span class="gl">para o dedo.</span></h2>
+      <p class="body">Nada de foto de banco de imagem: conceito, produção e pós-produção feitos aqui dentro. É esse padrão que entra no seu anúncio.</p>
+    </div>
+  </div>
+  <div class="strip">
+    <div class="tk" id="conceitk">
+      <div class="shot port"><img src="assets/img/conceito/04-mini-clones.jpg" alt="" loading="lazy"><span>Conceito · um time inteiro</span></div>
+      <div class="shot port"><img src="assets/img/conceito/06-letras-3d-renan.jpg" alt="" loading="lazy"><span>Marca em 3D</span></div>
+      <div class="shot port"><img src="assets/img/conceito/08-cabeca-gigante-obra.jpg" alt="" loading="lazy"><span>Construção de marca</span></div>
+      <div class="shot port"><img src="assets/img/conceito/12-card-perfil-3d.jpg" alt="" loading="lazy"><span>Perfil que vira cartão</span></div>
+      <div class="shot port"><img src="assets/img/conceito/01-saindo-celular-carteira.jpg" alt="" loading="lazy"><span>Do celular pro caixa</span></div>
+      <div class="shot port"><img src="assets/img/conceito/07-multi-bracos.jpg" alt="" loading="lazy"><span>Produção completa</span></div>
+      <div class="shot port"><img src="assets/img/conceito/09-outdoor-gigante.jpg" alt="" loading="lazy"><span>Mídia grande</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= TRÁFEGO ================= -->
 <section class="split" id="trafego">
   <div class="rv">
@@ -1191,7 +1215,7 @@ Tiago Ferreira</textarea>
     </ul>
     <a class="btn solid" style="margin-top:24px" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20anunciar%20no%20Meta%20e%20no%20Google." target="_blank" rel="noopener">Quero anunciar</a>
   </div>
-  <div class="pic rv"><img src="assets/img/trafego.jpg" alt="Painel de anúncios" loading="lazy"></div>
+  <div class="pic tallpic rv"><img src="assets/img/conceito/10-celular-dinheiro.jpg" alt="Retorno do anúncio" loading="lazy"></div>
 </section>
 
 <div class="figures rv">
@@ -1228,7 +1252,7 @@ Tiago Ferreira</textarea>
 
 <!-- ================= MENTORIA ================= -->
 <section class="split" id="mentoria">
-  <div class="pic rv"><img src="assets/img/mentoria.jpg" alt="Mentoria para MEI" loading="lazy"></div>
+  <div class="pic tallpic rv"><img src="assets/img/conceito/11-wall-street.jpg" alt="Preço e margem" loading="lazy"></div>
   <div class="rv">
     <span class="kicker">Alavancar MEI</span>
     <h3 style="margin-top:14px">Não é só marketing.<br><span class="gl">É o negócio inteiro.</span></h3>
@@ -1337,7 +1361,7 @@ Tiago Ferreira</textarea>
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
   /* ---------- marquees sem emenda ---------- */
-  ['tk','strip','casetk'].forEach(id => {
+  ['tk','strip','casetk','conceitk'].forEach(id => {
     const t = document.getElementById(id);
     if (t) t.innerHTML += t.innerHTML;
   });
