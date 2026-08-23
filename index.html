@@ -7,8 +7,8 @@
 <meta name="description" content="Sites, landing pages, cardápio digital, convites, criativos, edição de vídeo, tráfego pago no Meta e Google, Google Maps e mentoria para MEI e microempresário.">
 <meta property="og:title" content="DOS REIS Soluções Digitais — a agência do pequeno negócio.">
 <meta property="og:description" content="Seu negócio é pequeno. Sua presença não precisa ser.">
-<meta property="og:image" content="assets/logo.png">
-<link rel="icon" href="assets/logo.png">
+<meta property="og:image" content="assets/logo-full.webp">
+<link rel="icon" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
          padding:14px clamp(16px,4vw,44px);transition:background .4s var(--ease),backdrop-filter .4s}
   header.solid{background:rgba(0,0,0,.6);backdrop-filter:blur(22px);border-bottom:1px solid var(--line)}
   .logo{display:flex;align-items:center;gap:10px}
-  .logo img{height:60px}
+  .logo img{height:64px}
   .logo b{font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
   .logo b i{display:block;font-style:normal;font-size:7.5px;letter-spacing:.28em;color:var(--fg3);font-weight:400;margin-top:2px}
   .menu{display:flex;gap:24px;font-size:13px;color:var(--fg2)}
@@ -621,6 +621,16 @@
   .split .pic img{width:100%;height:100%;object-fit:cover;opacity:.92;transition:.8s var(--ease)}
   .split .pic:hover img{transform:scale(1.05)}
   .split .pic::after{content:"";position:absolute;inset:0;background:linear-gradient(200deg,transparent 40%,rgba(0,0,0,.7))}
+  .split .me{position:relative;display:grid;place-items:end center;min-height:clamp(360px,46vw,560px)}
+  .split .me::before{content:"";position:absolute;left:50%;top:52%;width:min(90%,520px);aspect-ratio:1;transform:translate(-50%,-50%);
+    background:radial-gradient(closest-side,rgba(124,255,57,.30),rgba(124,255,57,.07) 55%,transparent 72%);filter:blur(8px);z-index:0}
+  .split .me img{position:relative;z-index:1;width:auto;max-width:min(100%,460px);max-height:clamp(360px,46vw,560px);display:block;
+    filter:drop-shadow(0 40px 60px rgba(0,0,0,.75))}
+  .split .me .tag{position:absolute;left:0;bottom:-6px;z-index:2;display:grid;gap:2px;text-align:left;
+    background:linear-gradient(90deg,rgba(0,0,0,.85),transparent);padding:8px 26px 8px 4px;border-radius:10px}
+  .split .me .tag b{font-size:17px;font-weight:600;letter-spacing:-.01em}
+  .split .me .tag span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+  @media(max-width:860px){.split .me{min-height:0;place-items:center}.split .me img{max-height:400px}}
   .split h3{font-size:clamp(26px,4vw,46px);font-weight:400;letter-spacing:-.04em;line-height:1.03;margin-bottom:16px;text-wrap:balance}
   .split h3 .gl{color:var(--green);text-shadow:0 0 50px var(--glow)}
   .split ul{list-style:none;display:grid;gap:9px;margin-top:18px}
@@ -657,7 +667,7 @@
   .final .halo{position:absolute;left:50%;top:58%;width:min(120vw,1000px);aspect-ratio:1;transform:translate(-50%,-50%);
     background:radial-gradient(closest-side,rgba(124,255,57,.15),transparent 66%);filter:blur(24px);pointer-events:none}
   .final .in{position:relative;z-index:2;display:grid;justify-items:center;gap:20px}
-  .final img{height:clamp(160px,21vw,240px)}
+  .final img{height:clamp(180px,24vw,280px)}
   .final .fine{font-size:11.5px;color:var(--fg3)}
   footer{position:relative;z-index:3;border-top:1px solid var(--line);padding:26px 20px 34px;text-align:center;font-size:11px;color:var(--fg3);line-height:2}
   footer b{color:var(--fg2);font-weight:400}
@@ -679,7 +689,7 @@
 <div class="noise"></div>
 
 <header id="hd">
-  <a class="logo" href="#top"><img src="assets/logo.png" alt="DOS REIS"><b>DOS REIS<i>Soluções Digitais</i></b></a>
+  <a class="logo" href="#top"><img src="assets/logo-mark.webp" alt="DOS REIS"><b>DOS REIS<i>Soluções Digitais</i></b></a>
   <nav class="menu">
     <a href="#servicos">Serviços</a>
     <a href="#ferramentas">Ferramentas</a>
@@ -873,6 +883,26 @@
     </div>
   </div>
 </div>
+
+<!-- ================= QUEM ESTÁ POR TRÁS ================= -->
+<section class="split" id="quem">
+  <div class="rv">
+    <span class="kicker">Quem está por trás</span>
+    <h3 style="margin-top:14px">Você não fala com robô.<br><span class="gl">Fala comigo.</span></h3>
+    <p class="body">Sou o Renan, dono da DOS REIS. Sou eu que olho o seu negócio, monto a proposta e acompanho a entrega — não tem central de atendimento no meio do caminho. A agência nasceu pra fazer pelo pequeno negócio o que agência grande só faz por quem tem verba grande.</p>
+    <ul>
+      <li>Diagnóstico gratuito antes de qualquer orçamento</li>
+      <li>Atendimento direto comigo, pelo WhatsApp</li>
+      <li>Entrega em 7 dias — e acompanhamento depois que está no ar</li>
+      <li>Preço de MEI, entrega de agência</li>
+    </ul>
+    <a class="btn solid" style="margin-top:24px" href="https://wa.me/5519988013439?text=Ol%C3%A1%20Renan!%20Vim%20pelo%20site%20e%20quero%20falar%20com%20voc%C3%AA." target="_blank" rel="noopener">Falar comigo agora</a>
+  </div>
+  <div class="me rv">
+    <img src="assets/img/renan-hero.webp" alt="Renan, fundador da DOS REIS Soluções Digitais" loading="lazy">
+    <div class="tag"><span>Fundador</span><b>Renan dos Reis</b></div>
+  </div>
+</section>
 
 <!-- ================= SERVIÇOS ================= -->
 <div class="wrap" id="servicos">
@@ -1296,7 +1326,7 @@ Tiago Ferreira</textarea>
 <section class="final">
   <div class="halo"></div>
   <div class="in rv">
-    <img src="assets/logo.png" alt="DOS REIS Soluções Digitais">
+    <img src="assets/logo-full.webp" alt="DOS REIS Soluções Digitais">
     <h2 class="display" style="max-width:16ch">Bora deixar seu negócio <span class="gl">visível?</span></h2>
     <p class="body" style="max-width:470px">Chama no WhatsApp e receba um diagnóstico gratuito: a gente olha como seu negócio aparece hoje e diz o que dá pra melhorar primeiro.</p>
     <a class="btn solid" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20o%20diagn%C3%B3stico%20gratuito%20da%20DOS%20REIS." target="_blank" rel="noopener">Quero meu diagnóstico</a>
