@@ -82,12 +82,12 @@
   .hero .phone{height:min(40svh,368px);width:auto}
   /* --- Elva-like: titulo gigante ATRAS do aparelho + lente de vidro --- */
   @media(min-width:1000px){
-    .hero-in{padding-top:clamp(30px,7vh,86px)}
+    .hero-in{padding-top:clamp(20px,4vh,54px)}
     .hero h1{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:1;width:min(1240px,94vw);margin:0;
       pointer-events:none;font-size:clamp(50px,6.6vw,100px);
       text-shadow:0 0 70px rgba(124,255,57,.22),1.6px 0 0 rgba(0,229,255,.14),-1.6px 0 0 rgba(255,0,170,.12)}
-    .hero .stage{margin-top:clamp(6px,1.6vh,22px)}
-    .hero .phone{height:min(54svh,545px)}
+    .hero .stage{margin-top:clamp(96px,15vh,190px)}
+    .hero .phone{height:min(44svh,430px)}
     .hero .scr{justify-content:center;gap:10px}
     .hero .glass{inset:-40px;border-radius:calc(clamp(32px,3.4vw,44px) + 40px);
       backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2)}
@@ -730,9 +730,8 @@
   .qa p{padding:0 18px 16px;color:var(--fg2);font-size:14px;line-height:1.65}
 
   /* ============ FINAL ============ */
-  .final{position:relative;z-index:3;min-height:82svh;display:grid;place-items:center;text-align:center;padding:96px 20px;overflow:hidden}
-  .final .halo{position:absolute;left:50%;top:58%;width:min(120vw,1000px);aspect-ratio:1;transform:translate(-50%,-50%);
-    background:radial-gradient(closest-side,rgba(124,255,57,.15),transparent 66%);filter:blur(24px);pointer-events:none}
+  .final{position:relative;z-index:3;background:linear-gradient(180deg,transparent,#000 20%,#000);min-height:82svh;display:grid;place-items:center;text-align:center;padding:96px 20px;overflow:hidden}
+  .final .halo{display:none}
   .final .in{position:relative;z-index:2;display:grid;justify-items:center;gap:20px}
   .final img{height:clamp(180px,24vw,280px)}
   .final .fine{font-size:11.5px;color:var(--fg3)}
