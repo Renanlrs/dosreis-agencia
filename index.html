@@ -259,6 +259,24 @@
   .svc h3{font-size:19px;font-weight:500;letter-spacing:-.02em;margin-bottom:7px}
   .svc p{font-size:13.4px;line-height:1.55;color:var(--fg2)}
   .svc.tall{min-height:380px}
+  .sist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+  .sist-grid .sist{grid-column:span 2}.sist-grid .sist:nth-child(n+4){grid-column:span 3}
+  @media(max-width:980px){.sist-grid{grid-template-columns:1fr 1fr}.sist-grid .sist,.sist-grid .sist:nth-child(n+4){grid-column:auto}.sist-grid .sist:last-child{grid-column:1/-1}}
+  @media(max-width:620px){.sist-grid{grid-template-columns:1fr}}
+  .sist{position:relative;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);border-radius:22px;padding:26px 24px;
+        background:linear-gradient(160deg,rgba(124,255,57,.06),rgba(255,255,255,.02) 40%,rgba(0,0,0,.4));transition:transform .5s var(--ease),border-color .4s}
+  .sist:hover{transform:translateY(-6px);border-color:rgba(124,255,57,.42)}
+  .sist .sig{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-weight:600;font-size:15px;letter-spacing:.04em;color:#03130a;
+        background:var(--green);box-shadow:0 0 30px rgba(124,255,57,.35)}
+  .sist .tg{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);font-weight:600}
+  .sist h3{font-size:22px;font-weight:500;letter-spacing:-.02em}
+  .sist p{font-size:14px;line-height:1.6;color:var(--fg2)}
+  .sist ul{list-style:none;display:grid;gap:6px;margin-bottom:6px}
+  .sist li{font-size:13px;color:var(--fg2);padding-left:16px;position:relative}
+  .sist li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:1px;background:var(--green)}
+  .sist .btn{margin-top:auto;justify-content:center;white-space:nowrap}
+  .svc .nicho{position:absolute;top:14px;left:14px;font-size:10.5px;letter-spacing:.08em;font-weight:500;color:#fff;
+         padding:6px 11px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(124,255,57,.35);backdrop-filter:blur(8px)}
 
   /* ============ CILINDRO ============ */
   .cyl-sec{position:relative;z-index:3;padding:clamp(60px,9vh,110px) 0 clamp(80px,11vh,140px);text-align:center;overflow:hidden}
@@ -759,7 +777,9 @@
   <nav class="menu">
     <a href="#servicos">Serviços</a>
     <a href="#ferramentas">Ferramentas</a>
+    <a href="#sistemas">Sistemas</a>
     <a href="#trabalhos">Trabalhos</a>
+    <a href="motion.html">Motion 3D</a>
     <a href="#mapa">Google Maps</a>
     <a href="#trafego">Tráfego pago</a>
     <a href="#mentoria">Mentoria MEI</a>
@@ -987,51 +1007,51 @@
   </div>
 
   <div class="grid">
-    <div class="svc tall rv"><img src="assets/img/conceito/13-celular-gigante.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc tall rv"><img src="assets/img/nicho/empreiteira-telhado.jpg" alt="Empreiteira · telhado" loading="lazy"><span class="nicho">Empreiteira · telhado</span><div class="in">
       <span class="n">01</span><h3>Sites profissionais</h3>
       <p>Sua empresa com endereço próprio na internet: rápido, bonito no celular e com botão direto pro WhatsApp.</p></div></div>
 
-    <div class="svc tall rv"><img src="assets/img/landing.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc tall rv"><img src="assets/img/nicho/eletricista-luvas.jpg" alt="Eletricista" loading="lazy"><span class="nicho">Eletricista</span><div class="in">
       <span class="n">02</span><h3>Landing pages</h3>
       <p>Página única feita pra uma coisa só: transformar quem clicou no anúncio em cliente falando com você.</p></div></div>
 
-    <div class="svc tall rv"><img src="assets/img/cardapio.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc tall rv"><img src="assets/img/nicho/padaria.jpg" alt="Padaria" loading="lazy"><span class="nicho">Padaria</span><div class="in">
       <span class="n">03</span><h3>Cardápio digital</h3>
       <p>QR code na mesa, foto dos pratos e preço que você mesmo atualiza em um minuto, sem reimprimir nada.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/convite.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/buffet.jpg" alt="Buffet e eventos" loading="lazy"><span class="nicho">Buffet e eventos</span><div class="in">
       <span class="n">04</span><h3>Convites digitais</h3>
       <p>Aniversário, casamento, chá de bebê: convite animado, com confirmação de presença e link pra mandar no zap.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/conceito/07-multi-bracos.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/pintura-interna.jpg" alt="Pintura e reforma" loading="lazy"><span class="nicho">Pintura e reforma</span><div class="in">
       <span class="n">05</span><h3>Criativos e artes</h3>
       <p>Post, story, promoção, cardápio impresso, banner. Sua marca falando a mesma língua em todo lugar.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/mkt/bastidor-estudio.webp" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/pintura-altura.jpg" alt="Pintura em altura" loading="lazy"><span class="nicho">Pintura em altura</span><div class="in">
       <span class="n">06</span><h3>Edição de vídeo</h3>
       <p>Reels e vídeos curtos com corte, legenda e trilha — do jeito que o algoritmo (e o cliente) gosta de ver.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/contrato.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/carpinteiros-telhado.jpg" alt="Obra em condomínio" loading="lazy"><span class="nicho">Obra em condomínio</span><div class="in">
       <span class="n">07</span><h3>Contrato de prestação de serviço</h3>
       <p>Modelo pronto pro seu tipo de trabalho, com prazo, valor e garantia claros. Você cobra melhor quando está protegido.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/conceito/09-outdoor-gigante.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/desentupidora.jpg" alt="Desentupidora" loading="lazy"><span class="nicho">Desentupidora</span><div class="in">
       <span class="n">08</span><h3>Tráfego pago</h3>
       <p>Meta e Google Ads configurados, acompanhados e ajustados. Você define quanto investir por dia — e vê o retorno.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/maps.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/distribuidora-bebidas.jpg" alt="Distribuidora de bebidas" loading="lazy"><span class="nicho">Distribuidora de bebidas</span><div class="in">
       <span class="n">09</span><h3>Google Meu Negócio</h3>
       <p>Perfil completo no Maps com fotos, horário e avaliações, pra aparecer primeiro na busca da sua região.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/conceito/03-cabeca-aberta.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/eletricista-quadro.jpg" alt="Eletricista MEI" loading="lazy"><span class="nicho">Eletricista MEI</span><div class="in">
       <span class="n">10</span><h3>Mentoria para MEI</h3>
       <p>Preço, oferta, atendimento e organização. A gente senta com você e monta o plano do próximo trimestre.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/conceito/05-action-figure.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/carpintaria-madeiramento.jpg" alt="Carpintaria" loading="lazy"><span class="nicho">Carpintaria</span><div class="in">
       <span class="n">11</span><h3>Identidade visual</h3>
       <p>Logo, cores, tipografia e aplicação. Sua marca reconhecível na fachada, no post e na embalagem.</p></div></div>
 
-    <div class="svc rv"><img src="assets/img/conceito/02-social-media-icones.jpg" alt="" loading="lazy"><div class="in">
+    <div class="svc rv"><img src="assets/img/nicho/acougue.jpg" alt="Açougue" loading="lazy"><span class="nicho">Açougue</span><div class="in">
       <span class="n">12</span><h3>Gestão de redes</h3>
       <p>Calendário, conteúdo e resposta. Seu perfil vivo, mesmo na semana em que você não tem tempo pra nada.</p></div></div>
   </div>
@@ -1182,6 +1202,27 @@ Tiago Ferreira</textarea>
       </div>
       <p class="foot">Cliente gira, ganha e volta pra usar. Você define os prêmios e o limite do dia.</p>
     </section>
+  </div>
+</div>
+
+<!-- ================= SISTEMAS ================= -->
+<div class="wrap" id="sistemas">
+  <div class="head rv">
+    <span class="kicker">Sistemas DOS REIS</span>
+    <h2 class="display">Quando o negócio cresce,<br><span class="gl">o sistema acompanha.</span></h2>
+    <p class="body">Além de marketing, a DOS REIS tem sistemas prontos para quem já passou da fase do caderninho. A gente instala, treina sua equipe e continua por perto.</p>
+  </div>
+  <div class="sist-grid">
+    <article class="sist rv"><span class="sig">AB</span><span class="tg">Projeto 3D da obra</span><h3>Acqua Belo</h3><p>Planta cotada, 3D, fachada, corte e orçamento da obra em um lugar só. O cliente vê a obra pronta antes do primeiro tijolo.</p><ul><li>Empreiteiro e construtora</li><li>Piscina e reforma</li><li>Obra em condomínio</li></ul>
+      <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Acqua%20Belo%20%28projeto%203D%20de%20obra%29." target="_blank" rel="noopener">Quero uma demonstração</a></article>
+    <article class="sist rv"><span class="sig">DR</span><span class="tg">Dinheiro organizado</span><h3>Dos Reis Financeiro</h3><p>Contas a pagar e a receber, fluxo de caixa e cobrança no WhatsApp. Você sabe quanto entrou, quanto sai e quem está devendo.</p><ul><li>MEI e microempresa</li><li>Prestador de serviço</li><li>Quem vende fiado</li></ul>
+      <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Dos%20Reis%20Financeiro." target="_blank" rel="noopener">Quero uma demonstração</a></article>
+    <article class="sist rv"><span class="sig">SE</span><span class="tg">Inglês com professora virtual</span><h3>Speak Easy</h3><p>Aulas curtas de conversação no celular, com professora em vídeo e progresso salvo. Para a equipe atender turista e cliente de fora.</p><ul><li>Comércio e turismo</li><li>Equipe de atendimento</li><li>Quem quer viajar</li></ul>
+      <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Speak%20Easy%20%28ingl%C3%AAs%29." target="_blank" rel="noopener">Quero uma demonstração</a></article>
+    <article class="sist rv"><span class="sig">TV</span><span class="tg">Gestão completa da loja</span><h3>Torres Viana ERP</h3><p>Estoque, vendas, caixa, compras e atendimento no WhatsApp com IA. Feito para farmácia, mercado e distribuidora que precisam de controle de verdade.</p><ul><li>Farmácia e drogaria</li><li>Mercado e distribuidora</li><li>Loja com estoque</li></ul>
+      <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Torres%20Viana%20ERP." target="_blank" rel="noopener">Quero uma demonstração</a></article>
+    <article class="sist rv"><span class="sig">LI</span><span class="tg">Frete e entrega sob controle</span><h3>Logística Inteligente</h3><p>Cotação de frete, ordem de coleta, frota própria, rastreio por GPS e torre de controle das entregas.</p><ul><li>Transportadora</li><li>Distribuidora de bebidas</li><li>Quem entrega todo dia</li></ul>
+      <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20a%20Log%C3%ADstica%20Inteligente." target="_blank" rel="noopener">Quero uma demonstração</a></article>
   </div>
 </div>
 

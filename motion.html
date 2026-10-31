@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motion 3D — DOS REIS Soluções Digitais</title>
+<meta name="description" content="Vídeos publicitários em motion design 3D: curta em reação em cadeia, comercial do seu app ou cardápio e animação de logo com aplicações. Pronto para Reels, TikTok, YouTube e telão.">
+<meta property="og:title" content="Sua marca em movimento — DOS REIS Motion 3D">
+<meta property="og:description" content="O tipo de vídeo que faz o dedo parar no Reels.">
+<meta property="og:image" content="assets/logo-full.webp">
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;--fg:#fff;--fg2:rgba(255,255,255,.62);--fg3:rgba(255,255,255,.34);
+    --green:#7CFF39;--green-2:#B6FF7A;--glow:rgba(124,255,57,.55);
+    --line:rgba(255,255,255,.09);--glass:rgba(255,255,255,.045);
+    --ease:cubic-bezier(.22,1,.36,1);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;background:#000}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--fg);
+       overflow-x:hidden;-webkit-font-smoothing:antialiased;font-weight:300}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  ::selection{background:var(--green);color:#03130a}
+
+  /* ============ NAV ============ */
+  header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:14px;
+         padding:14px clamp(16px,4vw,44px);transition:background .4s var(--ease),backdrop-filter .4s}
+  header.solid{background:rgba(0,0,0,.6);backdrop-filter:blur(22px);border-bottom:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo img{height:56px}
+  .logo b{font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap}
+  .logo b i{display:block;font-style:normal;font-size:7.5px;letter-spacing:.28em;color:var(--fg3);font-weight:400;margin-top:2px}
+  .menu{display:flex;gap:24px;font-size:13px;color:var(--fg2)}
+  .menu a{transition:.25s}.menu a:hover{color:var(--green)}
+  @media(max-width:1000px){.menu{display:none}}
+  .nav-cta{font-size:12.5px;font-weight:500;color:var(--fg2);border:1px solid var(--line);border-radius:999px;padding:9px 18px;
+           transition:.3s var(--ease);white-space:nowrap;backdrop-filter:blur(10px)}
+  .nav-cta:hover{color:#03130a;background:var(--green);border-color:var(--green);box-shadow:0 0 30px rgba(124,255,57,.4)}
+
+  /* ============ TIPOGRAFIA ============ */
+  .display{font-weight:400;letter-spacing:-.045em;line-height:1;font-size:clamp(34px,6vw,84px);text-wrap:balance}
+  .display .thin{font-weight:200;color:var(--fg2)}
+  .gl{color:#D8FFB8;
+    text-shadow:0 0 2px rgba(216,255,184,.9),0 0 10px rgba(124,255,57,.95),0 0 26px rgba(124,255,57,.75),
+                0 0 60px rgba(124,255,57,.55),0 0 120px rgba(124,255,57,.35)}
+  .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+  .body{font-size:clamp(14px,1.35vw,16.5px);line-height:1.7;color:var(--fg2)}
+
+  /* ============ BOTÕES ============ */
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:14px 28px;font-size:14px;font-weight:500;transition:.3s var(--ease)}
+  .btn.solid{background:var(--green);color:#03130a;box-shadow:0 10px 40px rgba(124,255,57,.28)}
+  .btn.solid:hover{background:var(--green-2);transform:translateY(-2px);box-shadow:0 14px 50px rgba(124,255,57,.45)}
+  .btn.line{border:1px solid var(--line);color:var(--fg2)}
+  .btn.line:hover{border-color:rgba(255,255,255,.42);color:#fff}
+
+  /* ============ HERO ============ */
+  .hero{position:relative;min-height:min(92svh,860px);display:grid;place-items:center;text-align:center;padding:120px 20px 60px;overflow:hidden}
+  .hero::before{content:"";position:absolute;left:50%;top:46%;width:min(120vw,1100px);aspect-ratio:1;transform:translate(-50%,-50%);
+    background:radial-gradient(closest-side,rgba(124,255,57,.14),transparent 68%);filter:blur(20px);pointer-events:none}
+  .hero .in{position:relative;display:grid;justify-items:center;gap:22px;max-width:1100px}
+  .hero .sub{max-width:600px}
+  .hero .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .live{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--fg2);
+        border:1px solid var(--line);border-radius:999px;padding:7px 14px}
+  .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 10px #ff3b3b;animation:blink 1.2s steps(2) infinite}
+  @keyframes blink{50%{opacity:.2}}
+
+  /* ============ PEÇAS ============ */
+  .peca{position:relative;padding:clamp(60px,10vh,120px) clamp(16px,4vw,44px);max-width:1280px;margin:0 auto}
+  .peca .head{display:grid;grid-template-columns:auto 1fr;gap:10px 28px;align-items:end;margin-bottom:32px}
+  .peca .num{font-family:var(--mono);font-size:12px;color:var(--fg3);letter-spacing:.14em;grid-row:span 2;align-self:start;padding-top:10px}
+  .peca .num b{color:var(--green);font-weight:600}
+  .peca h2{font-size:clamp(28px,4.2vw,56px);font-weight:400;letter-spacing:-.04em;line-height:1.02}
+  .peca .grid{display:grid;grid-template-columns:1fr 330px;gap:36px;align-items:start}
+  @media(max-width:980px){.peca .grid{grid-template-columns:1fr}.peca .head{grid-template-columns:1fr}.peca .num{grid-row:auto}}
+  .peca aside{display:grid;gap:20px}
+  .peca aside ul{list-style:none;display:grid;gap:9px}
+  .peca aside li{font-size:14px;color:var(--fg2);padding-left:20px;position:relative}
+  .peca aside li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:1px;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .peca aside h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--fg3);font-weight:400;text-transform:uppercase}
+
+  /* moldura de "monitor de edição" */
+  .tela{position:relative;border-radius:18px;padding:10px 10px 0;background:linear-gradient(160deg,#1b1b1b,#070707 40%,#111);
+        border:1px solid rgba(255,255,255,.08);box-shadow:0 50px 120px rgba(0,0,0,.85),0 0 80px rgba(124,255,57,.07)}
+  .tela .bar{display:flex;align-items:center;gap:7px;padding:2px 6px 10px;font-family:var(--mono);font-size:10.5px;color:var(--fg3)}
+  .tela .bar i{width:9px;height:9px;border-radius:50%;background:#333}
+  .tela .bar i:nth-child(1){background:#ff5f57}.tela .bar i:nth-child(2){background:#febc2e}.tela .bar i:nth-child(3){background:#28c840}
+  .tela .bar span{margin-left:10px}
+  .tela .bar em{margin-left:auto;font-style:normal;color:var(--green)}
+  .vp{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;isolation:isolate}
+  .tl{position:relative;height:34px;display:flex;align-items:center;gap:12px;padding:0 6px;font-family:var(--mono);font-size:10.5px;color:var(--fg3)}
+  .tl .tc{color:#fff;min-width:86px}
+  .tl .track{position:relative;flex:1;height:14px;border-radius:3px;
+    background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,transparent 1px 22px),rgba(255,255,255,.03)}
+  .tl .track b{position:absolute;top:3px;height:8px;border-radius:2px;background:rgba(124,255,57,.28)}
+  .tl .ph{position:absolute;top:-4px;bottom:-4px;width:2px;background:#ff3b3b;box-shadow:0 0 8px #ff3b3b}
+
+  /* ---------- PEÇA 1 : curta 3D ---------- */
+  #p1 canvas{position:absolute;inset:0;width:100%;height:100%}
+  #p1 .fade{position:absolute;inset:0;background:#000;pointer-events:none;opacity:0}
+  #p1 .cap{position:absolute;left:0;right:0;bottom:7%;text-align:center;font-weight:300;letter-spacing:-.02em;
+           font-size:clamp(14px,2.4vw,30px);opacity:0;pointer-events:none}
+  #p1 .fallback{position:absolute;inset:0;display:none;place-items:center;font-family:var(--mono);font-size:12px;color:var(--fg3)}
+
+  /* ---------- PEÇA 2 : comercial de app ---------- */
+  #p2{background:
+      radial-gradient(70% 90% at 30% 40%,rgba(255,160,90,.20),transparent 60%),
+      repeating-linear-gradient(97deg,rgba(0,0,0,.18) 0 2px,transparent 2px 9px,rgba(255,200,150,.04) 9px 11px,transparent 11px 23px),
+      linear-gradient(115deg,#5a3418,#2c180b 45%,#120904)}
+  #p2::after{content:"";position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(120% 100% at 50% 50%,transparent 45%,rgba(0,0,0,.65))}
+  #p2 .stage{position:absolute;inset:0;perspective:1200px;display:grid;place-items:center}
+  #p2 .cam{position:absolute;left:50%;top:50%;width:300px;height:620px;margin:-310px 0 0 -150px;transform-style:preserve-3d;will-change:transform}
+  #p2 .shadow{position:absolute;inset:6% -4% -6% 6%;border-radius:60px;background:rgba(0,0,0,.65);filter:blur(26px);transform:translateZ(-30px)}
+  #p2 .ph2{position:relative;width:300px;height:620px;border-radius:46px;padding:9px;transform-style:preserve-3d;
+    background:linear-gradient(150deg,#4a4a4a,#111 30%,#000 60%,#333);box-shadow:inset 0 0 2px rgba(255,255,255,.5)}
+  #p2 .scr{position:relative;height:100%;border-radius:38px;overflow:hidden;background:#07090a;padding:18px 16px;font-size:12px;color:#e9ece9}
+  #p2 .sb{display:flex;justify-content:space-between;font-weight:600;font-size:12px;margin:0 8px 16px}
+  #p2 .ttl{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  #p2 .ttl img{width:30px;height:30px;border-radius:50%;background:#000;border:1px solid #222;object-fit:contain}
+  #p2 .ttl b{font-size:17px;font-weight:600}
+  #p2 .ttl small{display:block;font-size:10px;color:#7d867f;font-weight:400}
+  #p2 .lbl{display:grid;grid-template-columns:28px 1fr 64px 30px;gap:6px;font-size:9.5px;color:#6f7871;letter-spacing:.08em;text-transform:uppercase;margin:16px 4px 6px}
+  #p2 .row{display:grid;grid-template-columns:28px 1fr 64px 30px;gap:6px;align-items:center;padding:10px 4px;border-radius:9px;margin-bottom:4px;
+           transition:background .25s;font-size:12.5px}
+  #p2 .row .n{color:#7d867f;font-family:var(--mono)}
+  #p2 .row .v{font-family:var(--mono);text-align:right;font-weight:600}
+  #p2 .row .ck{width:24px;height:24px;border-radius:7px;background:#1b1f1c;display:grid;place-items:center;color:#03130a;font-weight:700;font-size:13px}
+  #p2 .row.on{background:rgba(124,255,57,.16)}
+  #p2 .row.on .ck{background:var(--green);box-shadow:0 0 12px rgba(124,255,57,.6)}
+  #p2 .add{margin:12px 4px;padding:11px;border-radius:10px;background:#141815;text-align:center;font-weight:600;color:#cfd6d0}
+  #p2 .tot{display:flex;justify-content:space-between;margin:14px 6px 0;color:#7d867f}
+  #p2 .tot b{color:#fff;font-family:var(--mono);font-size:15px}
+  #p2 .rec{position:absolute;left:14px;right:14px;top:188px;border-radius:18px;padding:16px 16px 14px;background:linear-gradient(160deg,#121813,#060807);
+           border:1px solid rgba(124,255,57,.25);box-shadow:0 30px 60px rgba(0,0,0,.7);transform-origin:50% 60%;opacity:0}
+  #p2 .rec .k{font-size:9.5px;letter-spacing:.16em;color:var(--green);font-weight:600}
+  #p2 .rec .big{font-size:34px;font-weight:700;letter-spacing:-.03em;margin:8px 0 2px;font-family:var(--mono)}
+  #p2 .rec .d{display:flex;justify-content:space-between;color:#8a948c;font-size:11px}
+  #p2 .rec .d i{font-style:normal;color:var(--green);font-weight:600}
+  #p2 svg.trail{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;transform:translateZ(2px);
+    filter:drop-shadow(0 0 3px #eaffd9) drop-shadow(0 0 8px var(--green)) drop-shadow(0 0 22px var(--green))}
+  #p2 svg.trail path{fill:none;stroke:#effff0;stroke-width:3;stroke-linecap:round}
+  #p2 svg.trail circle{fill:#fff}
+
+  /* ---------- PEÇA 3 : animação de logo ---------- */
+  #p3{background:radial-gradient(70% 70% at 50% 50%,#062016,#020806 70%)}
+  #p3 .ly{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none}
+  #p3 .dot{width:2.2%;aspect-ratio:1;background:var(--green);box-shadow:0 0 20px var(--green),0 0 60px var(--green)}
+  #p3 .st{position:absolute;left:-30%;width:160%;height:.55%;top:50%;
+    background:linear-gradient(90deg,transparent,rgba(124,255,57,.15) 20%,#d9ffc4 50%,rgba(124,255,57,.15) 80%,transparent);
+    box-shadow:0 0 18px rgba(124,255,57,.6)}
+  #p3 .logo3{width:30%;filter:drop-shadow(0 0 18px rgba(124,255,57,.55))}
+  #p3 svg.swoosh{position:absolute;width:40%;overflow:visible}
+  #p3 svg.swoosh path{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 0 6px #fff)}
+  /* mockups */
+  .mk-poster{width:44%;aspect-ratio:1;background:#eef1ec;box-shadow:0 30px 60px rgba(0,0,0,.5);display:grid;place-items:center;position:relative;
+    background-image:linear-gradient(115deg,transparent 40%,rgba(0,0,0,.05) 41%,transparent 60%)}
+  .mk-poster img{width:46%;filter:brightness(.42) saturate(2.4) contrast(1.4)}
+  .mk-poster .t1{position:absolute;left:7%;top:6%;font-weight:700;font-size:clamp(10px,2vw,22px);line-height:.95;color:#1b7a3d;letter-spacing:-.02em}
+  .mk-poster .t2{position:absolute;right:7%;bottom:6%;font-weight:700;font-size:clamp(9px,1.6vw,18px);line-height:.95;color:#5bd16a;text-align:right}
+  .mk-perfil{width:52%;background:#fff;border-radius:22px 22px 0 0;padding:4% 5% 6%;color:#111;box-shadow:0 30px 70px rgba(0,0,0,.6);
+    transform:perspective(900px) rotateY(-14deg) rotateX(6deg)}
+  .mk-perfil .r{display:flex;align-items:center;gap:6%}
+  .mk-perfil .av{width:26%;aspect-ratio:1;border-radius:50%;background:#000;display:grid;place-items:center;overflow:hidden}
+  .mk-perfil .av img{width:78%}
+  .mk-perfil .n{font-weight:600;font-size:clamp(10px,1.7vw,19px)}
+  .mk-perfil .s{font-size:clamp(7px,1.05vw,12px);color:#666;margin-top:4px}
+  .mk-perfil .bt{display:flex;gap:4%;margin-top:7%}
+  .mk-perfil .bt span{flex:1;padding:3% 0;border-radius:8px;background:#e8f0ff;color:#2a5bd7;text-align:center;font-size:clamp(7px,1.1vw,12px);font-weight:600}
+  .mk-perfil .bt span:first-child{background:#2a5bd7;color:#fff}
+  .mk-mesa{position:absolute;inset:0;background:linear-gradient(160deg,#f3f3f1,#cfcfca);display:grid;place-items:center;perspective:900px}
+  .mk-cartao{width:40%;aspect-ratio:1.6;border-radius:6%;background:linear-gradient(140deg,#0b0f0c,#000);box-shadow:-30px 40px 50px rgba(0,0,0,.35);
+    transform:rotateX(52deg) rotateZ(-24deg);display:grid;place-items:center;position:relative}
+  .mk-cartao img{width:34%}
+  .mk-cartao span{position:absolute;bottom:9%;right:7%;font-size:clamp(5px,.9vw,10px);letter-spacing:.24em;color:#9aa;font-weight:600}
+  .mk-muro{position:absolute;inset:0;display:grid;place-items:center;
+    background:
+      linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.45)),
+      repeating-linear-gradient(0deg,#5c3a28 0 22px,#3b2418 22px 25px),
+      #5c3a28}
+  .mk-muro::before{content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(90deg,transparent 0 60px,#3b2418 60px 63px);
+    -webkit-mask:repeating-linear-gradient(0deg,#000 0 25px,transparent 25px 50px);mask:repeating-linear-gradient(0deg,#000 0 25px,transparent 25px 50px)}
+  .mk-placa{position:relative;width:30%;aspect-ratio:1;border-radius:4%;background:linear-gradient(150deg,#141a16,#050706);
+    box-shadow:0 30px 50px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.08);display:grid;place-items:center;transform:perspective(800px) rotateY(18deg)}
+  .mk-placa img{width:72%;filter:drop-shadow(0 0 14px rgba(124,255,57,.9))}
+  .mk-tecido{position:absolute;inset:0;display:grid;place-items:center;
+    background:
+      radial-gradient(40% 30% at 20% 30%,rgba(255,255,255,.18),transparent 70%),
+      radial-gradient(30% 60% at 70% 60%,rgba(0,0,0,.45),transparent 70%),
+      radial-gradient(50% 25% at 60% 15%,rgba(255,255,255,.12),transparent 70%),
+      linear-gradient(125deg,#0f5a2c,#063a1b 40%,#0c4d25 60%,#03240f)}
+  .mk-tecido img{width:30%;mix-blend-mode:screen;opacity:.85;filter:saturate(.6) brightness(1.1);transform:perspective(700px) rotateX(18deg) rotateZ(-8deg)}
+  .mk-grid{position:absolute;inset:0;background:#f1f2ef;display:grid;place-items:center}
+  .mk-grid img{width:30%;filter:grayscale(1) brightness(.35) contrast(2.2);opacity:.55}
+  .mk-grid svg{position:absolute;width:44%;overflow:visible}
+  .mk-grid svg *{fill:none;stroke:#555;stroke-width:.6}
+  .mk-esfera{position:absolute;inset:0;display:grid;place-items:center}
+  .mk-esfera .bola{width:22%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#e9ece6 35%,#b7bcb3 75%,#7d827a);box-shadow:0 30px 50px rgba(0,0,0,.6)}
+  .mk-esfera img{position:absolute;width:24%;filter:drop-shadow(0 0 10px rgba(124,255,57,.6))}
+  .mk-esfera .nm{position:absolute;top:74%;font-weight:600;font-size:clamp(10px,1.8vw,20px);letter-spacing:.2em;color:#fff}
+  #p3 .linha{width:.5%;height:12%;background:var(--green);box-shadow:0 0 16px var(--green)}
+
+  /* ============ COMO FUNCIONA / ENTREGA ============ */
+  .sec{padding:clamp(70px,12vh,140px) clamp(16px,4vw,44px);max-width:1280px;margin:0 auto}
+  .sec h2{font-size:clamp(30px,4.6vw,62px);font-weight:400;letter-spacing:-.045em;line-height:1.02;margin:14px 0 40px;max-width:900px}
+  .passos{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:900px){.passos{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.passos{grid-template-columns:1fr}}
+  .passo{border:1px solid var(--line);border-radius:20px;padding:26px 22px;background:var(--glass)}
+  .passo b{font-family:var(--mono);font-size:12px;color:var(--green)}
+  .passo h3{font-size:20px;font-weight:500;letter-spacing:-.02em;margin:16px 0 8px}
+  .passo p{font-size:14px;line-height:1.6;color:var(--fg2)}
+  .formatos{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:end}
+  @media(max-width:760px){.formatos{grid-template-columns:1fr}}
+  .fmt{border:1px solid var(--line);border-radius:18px;padding:22px;display:grid;gap:16px;justify-items:center;text-align:center}
+  .fmt .box{border:1px solid rgba(124,255,57,.5);border-radius:8px;box-shadow:0 0 30px rgba(124,255,57,.12),inset 0 0 30px rgba(124,255,57,.06);
+            display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--green)}
+  .fmt h3{font-size:17px;font-weight:500}
+  .fmt p{font-size:13px;color:var(--fg2);line-height:1.55}
+  .extras{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .extras span{border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:13px;color:var(--fg2)}
+
+  .final{text-align:center;padding:clamp(90px,16vh,180px) 20px;position:relative;overflow:hidden}
+  .final::before{content:"";position:absolute;left:50%;top:50%;width:min(110vw,1000px);aspect-ratio:1;transform:translate(-50%,-50%);
+    background:radial-gradient(closest-side,rgba(124,255,57,.16),transparent 68%);pointer-events:none}
+  .final .in{position:relative;display:grid;justify-items:center;gap:24px}
+  footer{border-top:1px solid var(--line);padding:30px 20px 90px;text-align:center;font-size:12px;color:var(--fg3);line-height:1.8}
+  footer b{color:var(--fg2);font-weight:500}
+  .wa{position:fixed;right:18px;bottom:18px;z-index:120;background:var(--green);color:#03130a;font-weight:600;font-size:14px;border-radius:999px;
+      padding:14px 22px;box-shadow:0 10px 40px rgba(124,255,57,.4)}
+
+  .rv{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+  .rv.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<header id="hd">
+  <a class="logo" href="index.html"><img src="assets/logo-mark.webp" alt="DOS REIS"><b>DOS REIS<i>Soluções Digitais</i></b></a>
+  <nav class="menu">
+    <a href="index.html">Início</a>
+    <a href="#curta">Curta 3D</a>
+    <a href="#comercial">Comercial de app</a>
+    <a href="#logo">Animação de logo</a>
+    <a href="#como">Como funciona</a>
+  </nav>
+  <a class="nav-cta" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20um%20v%C3%ADdeo%20em%20motion%203D%20para%20minha%20marca." target="_blank" rel="noopener">Quero um vídeo</a>
+</header>
+
+<section class="hero">
+  <div class="in">
+    <span class="live">AO VIVO · RODANDO NESTA PÁGINA</span>
+    <span class="tag">// MOTION DESIGN 3D</span>
+    <h1 class="display">Sua marca <span class="gl">em movimento.</span></h1>
+    <p class="body sub">Vídeo publicitário em 3D, comercial do seu app ou cardápio e animação de logo: o tipo de vídeo que faz o dedo parar no Reels. A DOS REIS cria, anima e entrega pronto pra postar.</p>
+    <div class="actions">
+      <a class="btn solid" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20um%20v%C3%ADdeo%20em%20motion%203D%20para%20minha%20marca." target="_blank" rel="noopener">Quero um vídeo assim</a>
+      <a class="btn line" href="#curta">Ver as 3 peças</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PEÇA 01 ================= -->
+<section class="peca" id="curta">
+  <div class="head rv">
+    <span class="num"><b>01</b> / 03</span>
+    <span class="tag">Curta 3D · reação em cadeia</span>
+    <h2>Uma peça derruba a outra. <span class="thin" style="color:var(--fg2);font-weight:200">No fim, a sua mensagem.</span></h2>
+  </div>
+  <div class="grid">
+    <div class="tela rv">
+      <div class="bar"><i></i><i></i><i></i><span>reacao-em-cadeia_v3.mp4</span><em>● RENDER</em></div>
+      <div class="vp" id="p1">
+        <canvas></canvas>
+        <div class="cap">Cada detalhe leva a <b class="gl" style="font-weight:500">um cliente novo.</b></div>
+        <div class="fade"></div>
+        <div class="fallback">Seu navegador não liberou o 3D — no vídeo final isso não acontece.</div>
+      </div>
+      <div class="tl" data-len="8.5"><span class="tc">00:00:00:00</span><div class="track"><b style="left:0;width:38%"></b><b style="left:40%;width:22%"></b><b style="left:64%;width:34%"></b><div class="ph"></div></div></div>
+    </div>
+    <aside class="rv">
+      <p class="body">Uma ideia vira uma sequência hipnótica: dominós, rampas e bolas de luz em cena 3D com reflexo no chão. Cada peça empurra a próxima até revelar o que você quer vender. Quem começa a assistir não consegue parar no meio.</p>
+      <div><h4>Ideal para</h4><ul><li>Lançamento de produto</li><li>Inauguração e contagem regressiva</li><li>Promoção relâmpago</li><li>Vídeo institucional curto</li></ul></div>
+      <a class="btn solid" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20um%20curta%203D%20em%20rea%C3%A7%C3%A3o%20em%20cadeia%20para%20minha%20marca." target="_blank" rel="noopener">Quero um desse</a>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= PEÇA 02 ================= -->
+<section class="peca" id="comercial">
+  <div class="head rv">
+    <span class="num"><b>02</b> / 03</span>
+    <span class="tag">Comercial de app · rastro de luz</span>
+    <h2>A câmera passeia pela sua tela <span style="color:var(--fg2);font-weight:200">como num comercial de carro.</span></h2>
+  </div>
+  <div class="grid">
+    <div class="tela rv">
+      <div class="bar"><i></i><i></i><i></i><span>comercial-app_final.mp4</span><em>● RENDER</em></div>
+      <div class="vp" id="p2">
+        <div class="stage">
+          <div class="cam">
+            <div class="shadow"></div>
+            <div class="ph2">
+              <div class="scr">
+                <div class="sb"><span>9:41</span><span>●●● 5G</span></div>
+                <div class="ttl"><img src="assets/logo-mark.webp" alt=""><div><b>Vendas de hoje</b><small>Seu negócio · sexta-feira</small></div></div>
+                <div class="lbl"><span>#</span><span>Pedido</span><span style="text-align:right">Valor</span><span></span></div>
+                <div class="row"><span class="n">118</span><span>2× Marmita G</span><span class="v">R$ 44</span><span class="ck">✓</span></div>
+                <div class="row"><span class="n">119</span><span>Combo família</span><span class="v">R$ 96</span><span class="ck">✓</span></div>
+                <div class="row"><span class="n">120</span><span>3× Açaí 500</span><span class="v">R$ 57</span><span class="ck">✓</span></div>
+                <div class="row"><span class="n">121</span><span>Corte + barba</span><span class="v">R$ 60</span><span class="ck">✓</span></div>
+                <div class="row"><span class="n">122</span><span>Kit presente</span><span class="v">R$ 129</span><span class="ck">✓</span></div>
+                <div class="add">+ Novo pedido</div>
+                <div class="tot"><span>Total do dia</span><b class="tv">R$ 0</b></div>
+                <div class="rec">
+                  <div class="k">★ NOVO RECORDE</div>
+                  <div class="big">R$ 2.480</div>
+                  <div class="d"><span>Faturamento do dia</span><i>+18% vs ontem</i></div>
+                </div>
+              </div>
+              <svg class="trail" viewBox="0 0 300 620">
+                <path class="t1" pathLength="1" d="M10 196 H290 V500 H10 Z"/>
+                <path class="t2" pathLength="1" d="M24 180 H276 Q286 180 286 190 V300 Q286 312 274 312 H26 Q14 312 14 300 V190 Q14 180 24 180"/>
+                <path class="t3" pathLength="1" d="M276 240 C 360 220, 420 120, 520 60"/>
+                <path class="t4" pathLength="1" d="M276 250 C 380 260, 460 300, 560 290"/>
+                <path class="t5" pathLength="1" d="M276 260 C 340 330, 400 420, 480 520"/>
+                <circle class="c3" r="6" cx="-99" cy="-99"/><circle class="c4" r="6" cx="-99" cy="-99"/><circle class="c5" r="6" cx="-99" cy="-99"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tl" data-len="11"><span class="tc">00:00:00:00</span><div class="track"><b style="left:0;width:20%"></b><b style="left:22%;width:30%"></b><b style="left:54%;width:44%"></b><div class="ph"></div></div></div>
+    </div>
+    <aside class="rv">
+      <p class="body">Seu sistema, cardápio digital ou loja online filmado em 3D: close nos números, os pedidos sendo confirmados, um rastro de luz correndo pela tela e o resultado aparecendo. Mostra o produto funcionando sem precisar explicar nada.</p>
+      <div><h4>Ideal para</h4><ul><li>Aplicativos e sistemas</li><li>Cardápio digital e delivery</li><li>Loja online e catálogo</li><li>Anúncio de Meta e Google</li></ul></div>
+      <a class="btn solid" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20um%20comercial%20em%203D%20do%20meu%20app%2Fcard%C3%A1pio." target="_blank" rel="noopener">Quero um desse</a>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= PEÇA 03 ================= -->
+<section class="peca" id="logo">
+  <div class="head rv">
+    <span class="num"><b>03</b> / 03</span>
+    <span class="tag">Animação de logo · aplicações</span>
+    <h2>Seu logo nasce da luz <span style="color:var(--fg2);font-weight:200">e vai parar em todo lugar.</span></h2>
+  </div>
+  <div class="grid">
+    <div class="tela rv">
+      <div class="bar"><i></i><i></i><i></i><span>vinheta-logo_dosreis.aep</span><em>● RENDER</em></div>
+      <div class="vp" id="p3">
+        <div class="ly l-dot"><div class="dot"></div></div>
+        <div class="ly l-st"><div class="st"></div><div class="st"></div><div class="st"></div><div class="st"></div></div>
+        <div class="ly l-logo">
+          <img class="logo3" src="assets/logo-mark.webp" alt="DOS REIS">
+          <svg class="swoosh" viewBox="0 0 100 100"><path pathLength="1" d="M8 60 C 20 20, 70 10, 92 38"/></svg>
+        </div>
+        <div class="ly m"><div class="mk-poster"><div class="t1">SUA MARCA<br>EM MOVIMENTO</div><img src="assets/logo-mark.webp" alt=""><div class="t2">DOS<br>REIS</div></div></div>
+        <div class="ly m"><div class="mk-perfil"><div class="r"><div class="av"><img src="assets/logo-mark.webp" alt=""></div><div><div class="n">DOS REIS</div><div class="s">Soluções Digitais · Marketing, Tecnologia e IA</div></div></div><div class="bt"><span>Seguir</span><span>Mensagem</span></div></div></div>
+        <div class="ly m"><div class="mk-mesa"><div class="mk-cartao"><img src="assets/logo-mark.webp" alt=""><span>DOS REIS</span></div></div></div>
+        <div class="ly m"><div class="mk-muro"><div class="mk-placa"><img src="assets/logo-mark.webp" alt=""></div></div></div>
+        <div class="ly m"><div class="mk-tecido"><img src="assets/logo-mark.webp" alt=""></div></div>
+        <div class="ly m"><div class="mk-grid"><img src="assets/logo-mark.webp" alt="">
+          <svg viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90"/><line x1="50" y1="0" x2="50" y2="100"/><line x1="0" y1="50" x2="100" y2="50"/>
+            <line x1="5" y1="5" x2="95" y2="95"/><line x1="95" y1="5" x2="5" y2="95"/><circle cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="30"/><circle cx="62" cy="40" r="16"/>
+            <line x1="5" y1="30" x2="95" y2="30"/><line x1="5" y1="70" x2="95" y2="70"/><line x1="30" y1="5" x2="30" y2="95"/><line x1="70" y1="5" x2="70" y2="95"/></svg></div></div>
+        <div class="ly m mk-esfera"><div class="bola"></div><img src="assets/logo-mark.webp" alt=""><span class="nm">DOS REIS</span></div>
+        <div class="ly l-fim"><div class="linha"></div></div>
+      </div>
+      <div class="tl" data-len="13"><span class="tc">00:00:00:00</span><div class="track"><b style="left:0;width:30%"></b><b style="left:31%;width:60%"></b><b style="left:92%;width:7%"></b><div class="ph"></div></div></div>
+    </div>
+    <aside class="rv">
+      <p class="body">Feixes de luz se cruzam e desenham o seu logo. Depois ele aparece aplicado na fachada, no cartão de visita, no perfil do Instagram, no cartaz e no tecido. Você ganha uma vinheta de abertura para todos os seus vídeos e um jeito profissional de apresentar a marca.</p>
+      <div><h4>Ideal para</h4><ul><li>Abertura de Reels e YouTube</li><li>Rebranding e marca nova</li><li>Apresentação para cliente</li><li>Telão de evento e loja</li></ul></div>
+      <a class="btn solid" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20uma%20anima%C3%A7%C3%A3o%20do%20meu%20logo." target="_blank" rel="noopener">Quero um desse</a>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= COMO FUNCIONA ================= -->
+<section class="sec" id="como">
+  <span class="tag rv">// COMO FUNCIONA</span>
+  <h2 class="rv">Você manda a ideia pelo WhatsApp. <span style="color:var(--fg2);font-weight:200">A gente devolve cinema.</span></h2>
+  <div class="passos">
+    <div class="passo rv"><b>01</b><h3>Briefing</h3><p>Conversa rápida pelo WhatsApp: o que você vende, pra quem e onde o vídeo vai rodar.</p></div>
+    <div class="passo rv"><b>02</b><h3>Roteiro</h3><p>Você recebe a ideia da cena e o roteiro quadro a quadro antes de começar a animar.</p></div>
+    <div class="passo rv"><b>03</b><h3>Animação 3D</h3><p>Montamos a cena com a sua marca, cores, logo e produto. Você acompanha a prévia.</p></div>
+    <div class="passo rv"><b>04</b><h3>Entrega</h3><p>Arquivos prontos para postar, anunciar e passar no telão, em todos os formatos.</p></div>
+  </div>
+</section>
+
+<section class="sec">
+  <span class="tag rv">// VOCÊ RECEBE</span>
+  <h2 class="rv">Um vídeo, <span class="gl">todos os formatos.</span></h2>
+  <div class="formatos">
+    <div class="fmt rv"><div class="box" style="width:90px;height:160px">9:16</div><h3>Reels, TikTok e Status</h3><p>Vertical, do jeito que o celular mostra.</p></div>
+    <div class="fmt rv"><div class="box" style="width:130px;height:130px">1:1</div><h3>Feed</h3><p>Quadrado para o feed do Instagram e Facebook.</p></div>
+    <div class="fmt rv"><div class="box" style="width:200px;height:113px">16:9</div><h3>YouTube, site e telão</h3><p>Horizontal para tela grande e apresentação.</p></div>
+  </div>
+  <div class="extras rv"><span>Versão curta de 6s para anúncio</span><span>Com e sem trilha</span><span>Legenda em português</span><span>Vinheta de abertura</span><span>Arquivo em alta</span></div>
+</section>
+
+<section class="final">
+  <div class="in rv">
+    <span class="tag">// SEU PRÓXIMO VÍDEO</span>
+    <h2 class="display">Seu concorrente posta foto. <span class="gl">Você posta cinema.</span></h2>
+    <a class="btn solid" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20um%20v%C3%ADdeo%20em%20motion%203D%20para%20minha%20marca." target="_blank" rel="noopener">Pedir meu orçamento</a>
+  </div>
+</section>
+
+<footer>
+  © 2026 <b>DOS REIS SOLUÇÕES DIGITAIS</b> · Marketing • Tecnologia • Inteligência Artificial<br>
+  <a href="index.html" style="color:var(--green)">← Voltar para o site</a>
+</footer>
+
+<a class="wa" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20falar%20com%20a%20DOS%20REIS." target="_blank" rel="noopener">Falar agora</a>
+
+<script>
+/* ===== relógio comum: ?t=, ?t1=, ?t2=, ?t3= congelam o tempo (validação/print) ===== */
+const Q = new URLSearchParams(location.search);
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const easeIn = k => k * k;
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+function clock(name, len) {
+  const f = Q.get(name) ?? Q.get('t');
+  return f != null ? parseFloat(f) % len : (performance.now() / 1000) % len;
+}
+// interpola keyframes [[t,{prop:valor}],...]
+function track(keys, t) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 0; i < keys.length - 1; i++) {
+    const [ta, a] = keys[i], [tb, b] = keys[i + 1];
+    if (t <= tb) { const k = ease(seg(t, ta, tb)); const o = {}; for (const p in a) o[p] = lerp(a[p], b[p], k); return o; }
+  }
+  return keys[keys.length - 1][1];
+}
+function timeline(vp, t, len) {
+  const tl = vp.parentElement.querySelector('.tl');
+  const f = Math.floor((t % 1) * 30);
+  tl.querySelector('.tc').textContent = '00:00:' + String(Math.floor(t)).padStart(2, '0') + ':' + String(f).padStart(2, '0');
+  tl.querySelector('.ph').style.left = (t / len * 100) + '%';
+}
+// só anima o que está visível
+const visible = new Map();
+const io = new IntersectionObserver(es => es.forEach(e => visible.set(e.target, e.isIntersecting)), {rootMargin: '100px'});
+document.querySelectorAll('.vp').forEach(v => { visible.set(v, true); io.observe(v); });
+window.MOTION = {clock, track, seg, ease, easeIn, cl, lerp, timeline, visible};
+
+/* ===== PEÇA 02 : comercial de app ===== */
+(function () {
+  const vp = document.getElementById('p2'), cam = vp.querySelector('.cam'), L = 11;
+  const rows = [...vp.querySelectorAll('.row')], rec = vp.querySelector('.rec'), tv = vp.querySelector('.tv');
+  const vals = [44, 96, 57, 60, 129];
+  const P = n => vp.querySelector(n);
+  const paths = {t1: P('.t1'), t2: P('.t2'), t3: P('.t3'), t4: P('.t4'), t5: P('.t5')};
+  const dots = [P('.c3'), P('.c4'), P('.c5')];
+  // câmera: x/y em px do aparelho, s = zoom, rx/rz/ry em graus
+  const K = [
+    [0.0, {x: 0, y: 0, s: .55, rx: 8, ry: 0, rz: -6}],
+    [1.2, {x: 0, y: 0, s: .62, rx: 14, ry: -10, rz: -10}],
+    [2.4, {x: -40, y: 70, s: 1.25, rx: 62, ry: 0, rz: -32}],
+    [4.2, {x: -70, y: 40, s: 1.7, rx: 52, ry: 0, rz: -18}],
+    [5.4, {x: 0, y: 30, s: 1.05, rx: 34, ry: 0, rz: -6}],
+    [7.0, {x: 0, y: 60, s: 1.35, rx: 48, ry: 0, rz: 14}],
+    [8.6, {x: 60, y: 20, s: 1.0, rx: 58, ry: 0, rz: 26}],
+    [10.2, {x: 0, y: 0, s: .55, rx: 8, ry: 0, rz: -6}],
+    [11, {x: 0, y: 0, s: .55, rx: 8, ry: 0, rz: -6}],
+  ];
+  function dash(p, head, len) { p.style.strokeDasharray = len + ' 2'; p.style.strokeDashoffset = (len - head).toString(); p.style.opacity = head > 0 ? 1 : 0; }
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!visible.get(vp)) return;
+    const t = clock('t2', L), base = vp.clientHeight / 620;
+    const c = track(K, t);
+    cam.style.transform = `scale(${base * c.s * 1.25}) translate(${c.x}px,${c.y}px) rotateX(${c.rx}deg) rotateY(${c.ry}deg) rotateZ(${c.rz}deg)`;
+    // pedidos sendo confirmados um a um
+    let total = 0;
+    rows.forEach((r, i) => { const on = t > 2.6 + i * .38 && t < 10.4; r.classList.toggle('on', on); if (on) total += vals[i]; });
+    tv.textContent = 'R$ ' + total;
+    // card de recorde salta
+    const kr = seg(t, 5.0, 5.6), out = seg(t, 9.9, 10.3);
+    rec.style.opacity = Math.min(kr, 1 - out);
+    rec.style.transform = `translateZ(${lerp(0, 46, ease(kr))}px) scale(${lerp(.7, 1, ease(kr))}) rotateX(${lerp(-25, 0, ease(kr))}deg)`;
+    // rastro de luz (cometa): contorna a lista, depois o card, depois escapa da tela
+    const a = seg(t, 2.0, 4.6);
+    dash(paths.t1, a > 0 && a < 1 ? a * 1.25 : 0, .25);
+    const b = seg(t, 5.6, 8.2);
+    dash(paths.t2, b > 0 && b < 1 ? b * 1.3 : 0, .3);
+    const ex = seg(t, 8.2, 9.6);
+    ['t3', 't4', 't5'].forEach((k, i) => {
+      const e = cl(ex * 1.15 - i * .07); const p = paths[k];
+      p.style.strokeDasharray = '1 1'; p.style.strokeDashoffset = (1 - e).toString(); p.style.opacity = ex > 0 && t < 10 ? 1 : 0;
+      const pt = p.getPointAtLength(p.getTotalLength() * e);
+      dots[i].setAttribute('cx', pt.x); dots[i].setAttribute('cy', pt.y); dots[i].style.opacity = ex > 0 && t < 10 ? 1 : 0;
+    });
+    timeline(vp, t, L);
+  }
+  frame();
+})();
+
+/* ===== PEÇA 03 : animação de logo ===== */
+(function () {
+  const vp = document.getElementById('p3'), L = 13;
+  const dot = vp.querySelector('.l-dot'), stL = vp.querySelector('.l-st'), sts = [...stL.children];
+  const lg = vp.querySelector('.l-logo'), logo = lg.querySelector('.logo3'), sw = lg.querySelector('.swoosh path');
+  const mks = [...vp.querySelectorAll('.m')], fim = vp.querySelector('.l-fim');
+  const ang = [62, -28, 18, -70];
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!visible.get(vp)) return;
+    const t = clock('t3', L);
+    // 1) ponto de luz
+    dot.style.opacity = cl(seg(t, .1, .4) - seg(t, .7, 1));
+    dot.firstElementChild.style.transform = `scale(${lerp(.3, 1.4, seg(t, .1, .9))}) rotate(${t * 90}deg)`;
+    // 2) feixes cruzando
+    stL.style.opacity = cl(seg(t, .6, .9) - seg(t, 3.0, 3.8));
+    sts.forEach((s, i) => {
+      const k = ease(seg(t, .7 + i * .18, 2.2 + i * .12));
+      s.style.transform = `rotate(${ang[i] + lerp(-25, 0, k)}deg) translateX(${lerp(-60, 0, k)}%) scaleY(${lerp(1.6, .5, seg(t, 2, 3.4))})`;
+      s.style.opacity = lerp(.2, 1, k);
+    });
+    // 3) logo de desfocado a nítido + swoosh branco
+    const kl = ease(seg(t, 1.7, 3.0));
+    lg.style.opacity = cl(seg(t, 1.6, 2.0) - seg(t, 4.0, 4.2));
+    logo.style.transform = `scale(${lerp(.55, 1, kl) + seg(t, 3, 4.1) * .06}) rotate(${lerp(-18, 0, kl)}deg)`;
+    logo.style.filter = `blur(${lerp(16, 0, kl)}px) drop-shadow(0 0 18px rgba(124,255,57,.55))`;
+    const ks = seg(t, 2.0, 3.0);
+    sw.style.strokeDasharray = '.35 2'; sw.style.strokeDashoffset = (.35 - ks * 1.4).toString(); sw.style.opacity = ks > 0 && ks < 1 ? 1 : 0;
+    // 4) aplicações: cada mockup ~1.15s, entra com zoom e sai em corte seco
+    mks.forEach((m, i) => {
+      const a = 4.1 + i * 1.15, b = i === mks.length - 1 ? 12.2 : a + 1.15;
+      const on = t >= a && t < b, k = ease(seg(t, a, a + .45));
+      m.style.opacity = on ? cl(k * 1.6) : 0;
+      m.style.transform = on ? `scale(${lerp(1.18, 1, k) - seg(t, a + .45, b) * .03})` : '';
+    });
+    // 5) fecha numa linha de luz
+    fim.style.opacity = cl(seg(t, 12.2, 12.4) - seg(t, 12.75, 12.95));
+    fim.firstElementChild.style.transform = `scaleY(${lerp(.1, 1.6, seg(t, 12.2, 12.9))})`;
+    timeline(vp, t, L);
+  }
+  frame();
+})();
+
+/* ===== ?so=<id> mostra só uma seção (validação) ===== */
+if (Q.get('so')) document.querySelectorAll('body > section').forEach(s => { if (s.id !== Q.get('so')) s.style.display = 'none'; });
+/* ===== header + reveal ===== */
+(function () {
+  const hd = document.getElementById('hd');
+  addEventListener('scroll', () => hd.classList.toggle('solid', scrollY > 40), {passive: true});
+  const ro = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } }), {threshold: .12});
+  document.querySelectorAll('.rv').forEach(el => Q.has('t') || Q.has('all') ? el.classList.add('in') : ro.observe(el));
+})();
+</script>
+
+<!-- ===== PEÇA 01 : curta 3D (three.js) ===== -->
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {Reflector} from 'three/addons/objects/Reflector.js';
+
+const {clock, seg, ease, easeIn, cl, lerp, timeline, visible} = window.MOTION;
+const vp = document.getElementById('p1'), canvas = vp.querySelector('canvas');
+const fade = vp.querySelector('.fade'), cap = vp.querySelector('.cap');
+const L = 8.5, GREEN = 0x7CFF39;
+
+let renderer;
+try { renderer = new THREE.WebGLRenderer({canvas, antialias: true}); }
+catch (e) { vp.querySelector('.fallback').style.display = 'grid'; throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.Fog(0x000000, 7, 16);
+const camera = new THREE.PerspectiveCamera(38, 16 / 9, .1, 60);
+
+// chão espelhado + película escura por cima (reflexo suave como no vídeo)
+const mirror = new Reflector(new THREE.PlaneGeometry(60, 60), {color: 0x2a2a2a, textureWidth: 1024, textureHeight: 1024});
+mirror.rotation.x = -Math.PI / 2; scene.add(mirror);
+const film = new THREE.Mesh(new THREE.PlaneGeometry(60, 60),
+  new THREE.MeshStandardMaterial({color: 0x050505, roughness: .55, metalness: .2, transparent: true, opacity: .78}));
+film.rotation.x = -Math.PI / 2; film.position.y = .002; scene.add(film);
+
+scene.add(new THREE.AmbientLight(0xffffff, .22));
+const key = new THREE.SpotLight(0xffffff, 140, 30, .6, .6); key.position.set(-2, 8, 5); scene.add(key); scene.add(key.target);
+
+// dominós numerados 1..9, cada um mais alto que o anterior
+function numTex(n) {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#1d2022'; g.fillRect(0, 0, 128, 256);
+  g.fillStyle = '#d9dcd8'; g.font = '600 64px Inter, Arial'; g.textAlign = 'center'; g.fillText(n, 64, 74);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const N = 9, SP = .8, TH = .14, DEP = .62, X0 = -3.4;
+const dom = [];
+for (let i = 0; i < N; i++) {
+  const h = .9 + i * .17;
+  const side = new THREE.MeshStandardMaterial({color: 0x55595c, metalness: .75, roughness: .3, emissive: GREEN, emissiveIntensity: 0});
+  const front = new THREE.MeshStandardMaterial({map: numTex(i + 1), metalness: .5, roughness: .4, emissive: GREEN, emissiveIntensity: 0});
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(TH, h, DEP), [side, side, side, side, front, side]);
+  mesh.position.set(-TH / 2, h / 2, 0);
+  const piv = new THREE.Group(); piv.position.set(X0 + i * SP + TH / 2, 0, -Math.sin(i * .5) * .35);
+  piv.add(mesh); scene.add(piv);
+  dom.push({piv, h, side, front, start: .7 + i * .26, rest: Math.asin(cl((SP - TH) / h, 0, 1))});
+}
+const XL = X0 + (N - 1) * SP;
+
+// bolas de luz
+function ball() {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(.17, 32, 16), new THREE.MeshStandardMaterial({color: 0xd9ffc4, emissive: GREEN, emissiveIntensity: 2.2}));
+  const l = new THREE.PointLight(GREEN, 1.4, 2.2); m.add(l); scene.add(m); return m;
+}
+const b1 = ball(), b2 = ball();
+
+// painel final (o "despertador" do vídeo vira o contador de clientes)
+const XD = XL + 3.1;
+const pc = document.createElement('canvas'); pc.width = 640; pc.height = 360; const pg = pc.getContext('2d');
+const ptex = new THREE.CanvasTexture(pc); ptex.colorSpace = THREE.SRGBColorSpace;
+let lastPanel = '';
+function drawPanel(v, lit) {
+  const key = v + '|' + lit.toFixed(2); if (key === lastPanel) return; lastPanel = key;
+  pg.fillStyle = '#020803'; pg.fillRect(0, 0, 640, 360);
+  pg.strokeStyle = `rgba(124,255,57,${.25 + lit * .75})`; pg.lineWidth = 8; pg.beginPath(); pg.roundRect(14, 14, 612, 332, 34); pg.stroke();
+  pg.fillStyle = `rgba(124,255,57,${.35 + lit * .65})`; pg.font = '600 30px "JetBrains Mono", monospace'; pg.textAlign = 'left';
+  pg.fillText('● NOVOS CLIENTES', 48, 78);
+  pg.font = '700 170px "JetBrains Mono", monospace'; pg.textAlign = 'center';
+  pg.shadowColor = '#7CFF39'; pg.shadowBlur = 30 * lit; pg.fillText(String(v).padStart(3, '0'), 320, 268); pg.shadowBlur = 0;
+  ptex.needsUpdate = true;
+}
+const panelMat = new THREE.MeshStandardMaterial({map: ptex, emissiveMap: ptex, emissive: 0xffffff, emissiveIntensity: .6});
+const caseMat = new THREE.MeshStandardMaterial({color: 0x161a17, metalness: .6, roughness: .35});
+const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.35, .35), [caseMat, caseMat, caseMat, caseMat, panelMat, caseMat]);
+panel.position.set(XD, .78, 0); panel.rotation.y = -.35; scene.add(panel);
+const pLight = new THREE.PointLight(GREEN, 0, 6); pLight.position.set(XD - .4, 1, 1); scene.add(pLight);
+
+// rampa entre o último dominó e o painel
+const ramp = new THREE.Mesh(new THREE.BoxGeometry(2.2, .05, .4), caseMat);
+ramp.position.set(XL + 1.3, .12, 0); scene.add(ramp);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .75, .4, .62); composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+function resize() {
+  const w = vp.clientWidth, h = vp.clientHeight;
+  renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(vp); resize();
+
+const look = new THREE.Vector3();
+function frame() {
+  requestAnimationFrame(frame);
+  if (!visible.get(vp)) return;
+  const t = clock('t1', L);
+
+  // bola 1 rola e derruba o primeiro dominó
+  const k1 = easeIn(seg(t, 0, .7)) ;
+  b1.position.set(lerp(X0 - 3.2, X0 - .32, Math.sqrt(k1)), .17, 0); b1.rotation.z = -b1.position.x / .17;
+
+  // efeito dominó: cai acelerando, depois descansa encostado no próximo
+  dom.forEach((d, i) => {
+    const k = easeIn(seg(t, d.start, d.start + .3));
+    const next = dom[i + 1];
+    const settle = next ? seg(t, next.start, next.start + .3) : 0;
+    const restA = i === N - 1 ? .95 : lerp(d.rest, Math.min(1.2, d.rest + .55), settle);
+    d.piv.rotation.z = -k * restA;
+    const glow = seg(t, d.start + .1, d.start + .4) * .18;
+    d.side.emissiveIntensity = glow * .6; d.front.emissiveIntensity = glow * .3;
+  });
+
+  // bola 2 desce a rampa até o painel
+  const tl2 = dom[N - 1].start + .25;
+  const k2 = easeIn(seg(t, tl2, tl2 + 1.3));
+  b2.position.set(lerp(XL + .5, XD - 1.35, k2), .3, 0); b2.rotation.z = -b2.position.x / .17;
+
+  // impacto: painel acende e conta clientes
+  const hit = tl2 + 1.3, kp = seg(t, hit, hit + .25), kc = ease(seg(t, hit, hit + 1.8));
+  drawPanel(Math.round(lerp(0, 128, kc)), kp);
+  pLight.intensity = kp * 3 + Math.max(0, 1 - seg(t, hit, hit + .5)) * (t > hit ? 12 : 0);
+
+  // câmera segue a "frente" da ação e recua no final
+  const xf = t < .7 ? lerp(X0 - 2.6, X0, ease(seg(t, 0, .7)))
+           : t < tl2 ? lerp(X0, XL, ease(seg(t, .7, tl2)))
+           : lerp(XL, XD - .3, ease(seg(t, tl2, hit + .3)));
+  const pull = ease(seg(t, hit + .3, 7.6));
+  camera.position.set(xf - 2.9 + pull * 2.2, 1.55 + pull * .3, 4.3 + pull * 1.4);
+  look.set(xf + .9 - pull * .9, .62 + pull * .25, 0); camera.lookAt(look);
+
+  cap.style.opacity = cl(seg(t, hit + 1.4, hit + 2) - seg(t, 8, 8.3));
+  fade.style.opacity = cl(1 - seg(t, 0, .35) + seg(t, 8.1, 8.5));
+  composer.render();
+  timeline(vp, t, L);
+}
+frame();
+</script>
+</body>
+</html>
