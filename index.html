@@ -266,8 +266,11 @@
   .sist{position:relative;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);border-radius:22px;padding:26px 24px;
         background:linear-gradient(160deg,rgba(124,255,57,.06),rgba(255,255,255,.02) 40%,rgba(0,0,0,.4));transition:transform .5s var(--ease),border-color .4s}
   .sist:hover{transform:translateY(-6px);border-color:rgba(124,255,57,.42)}
-  .sist .sig{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-weight:600;font-size:15px;letter-spacing:.04em;color:#03130a;
-        background:var(--green);box-shadow:0 0 30px rgba(124,255,57,.35)}
+  .sist .sig{height:64px;min-width:64px;padding:8px;border-radius:16px;display:inline-flex;align-items:center;justify-content:flex-start;align-self:flex-start;
+        background:rgba(255,255,255,.95);box-shadow:0 0 30px rgba(124,255,57,.22),inset 0 0 0 1px rgba(255,255,255,.6)}
+  .sist .sig img{height:100%;width:auto;max-width:150px;object-fit:contain;display:block}
+  .sist .sig.dark{background:#020403;box-shadow:0 0 30px rgba(124,255,57,.22),inset 0 0 0 1px rgba(124,255,57,.25)}
+  .sist .sig.full{padding:0;overflow:hidden}
   .sist .tg{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);font-weight:600}
   .sist h3{font-size:22px;font-weight:500;letter-spacing:-.02em}
   .sist p{font-size:14px;line-height:1.6;color:var(--fg2)}
@@ -1264,15 +1267,15 @@ Tiago Ferreira</textarea>
     <p class="body">Além de marketing, a DOS REIS tem sistemas prontos para quem já passou da fase do caderninho. A gente instala, treina sua equipe e continua por perto.</p>
   </div>
   <div class="sist-grid">
-    <article class="sist rv"><span class="sig">AB</span><span class="tg">Projeto 3D da obra</span><h3>Acqua Belo</h3><p>Planta cotada, 3D, fachada, corte e orçamento da obra em um lugar só. O cliente vê a obra pronta antes do primeiro tijolo.</p><ul><li>Empreiteiro e construtora</li><li>Piscina e reforma</li><li>Obra em condomínio</li></ul>
+    <article class="sist rv"><span class="sig full"><img src="assets/img/sistemas/acqua-belo.webp" alt="Logo Acqua Belo" width="160" height="160" loading="lazy"></span><span class="tg">Projeto 3D da obra</span><h3>Acqua Belo</h3><p>Planta cotada, 3D, fachada, corte e orçamento da obra em um lugar só. O cliente vê a obra pronta antes do primeiro tijolo.</p><ul><li>Empreiteiro e construtora</li><li>Piscina e reforma</li><li>Obra em condomínio</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Acqua%20Belo%20%28projeto%203D%20de%20obra%29." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig">DR</span><span class="tg">Dinheiro organizado</span><h3>Dos Reis Financeiro</h3><p>Contas a pagar e a receber, fluxo de caixa e cobrança no WhatsApp. Você sabe quanto entrou, quanto sai e quem está devendo.</p><ul><li>MEI e microempresa</li><li>Prestador de serviço</li><li>Quem vende fiado</li></ul>
+    <article class="sist rv"><span class="sig"><img src="assets/img/sistemas/dosreis-financeiro.webp" alt="Logo Dos Reis Financeiro" width="160" height="160" loading="lazy"></span><span class="tg">Dinheiro organizado</span><h3>Dos Reis Financeiro</h3><p>Contas a pagar e a receber, fluxo de caixa e cobrança no WhatsApp. Você sabe quanto entrou, quanto sai e quem está devendo.</p><ul><li>MEI e microempresa</li><li>Prestador de serviço</li><li>Quem vende fiado</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Dos%20Reis%20Financeiro." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig">SE</span><span class="tg">Inglês com professora virtual</span><h3>Speak Easy</h3><p>Aulas curtas de conversação no celular, com professora em vídeo e progresso salvo. Para a equipe atender turista e cliente de fora.</p><ul><li>Comércio e turismo</li><li>Equipe de atendimento</li><li>Quem quer viajar</li></ul>
+    <article class="sist rv"><span class="sig dark"><img src="assets/img/sistemas/speak-easy.webp" alt="Logo Speak Easy" width="160" height="160" loading="lazy"></span><span class="tg">Inglês com professora virtual</span><h3>Speak Easy</h3><p>Aulas curtas de conversação no celular, com professora em vídeo e progresso salvo. Para a equipe atender turista e cliente de fora.</p><ul><li>Comércio e turismo</li><li>Equipe de atendimento</li><li>Quem quer viajar</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Speak%20Easy%20%28ingl%C3%AAs%29." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig">TV</span><span class="tg">Gestão completa da loja</span><h3>Torres Viana ERP</h3><p>Estoque, vendas, caixa, compras e atendimento no WhatsApp com IA. Feito para farmácia, mercado e distribuidora que precisam de controle de verdade.</p><ul><li>Farmácia e drogaria</li><li>Mercado e distribuidora</li><li>Loja com estoque</li></ul>
+    <article class="sist rv"><span class="sig"><img src="assets/img/sistemas/torres-viana.webp" alt="Logo Torres Viana ERP" width="160" height="160" loading="lazy"></span><span class="tg">Gestão completa da loja</span><h3>Torres Viana ERP</h3><p>Estoque, vendas, caixa, compras e atendimento no WhatsApp com IA. Feito para farmácia, mercado e distribuidora que precisam de controle de verdade.</p><ul><li>Farmácia e drogaria</li><li>Mercado e distribuidora</li><li>Loja com estoque</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Torres%20Viana%20ERP." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig">LI</span><span class="tg">Frete e entrega sob controle</span><h3>Logística Inteligente</h3><p>Cotação de frete, ordem de coleta, frota própria, rastreio por GPS e torre de controle das entregas.</p><ul><li>Transportadora</li><li>Distribuidora de bebidas</li><li>Quem entrega todo dia</li></ul>
+    <article class="sist rv"><span class="sig"><img src="assets/img/sistemas/logistica.webp" alt="Logo Logística Inteligente" width="160" height="160" loading="lazy"></span><span class="tg">Frete e entrega sob controle</span><h3>Logística Inteligente</h3><p>Cotação de frete, ordem de coleta, frota própria, rastreio por GPS e torre de controle das entregas.</p><ul><li>Transportadora</li><li>Distribuidora de bebidas</li><li>Quem entrega todo dia</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20a%20Log%C3%ADstica%20Inteligente." target="_blank" rel="noopener">Quero uma demonstração</a></article>
   </div>
 
@@ -1984,6 +1987,6 @@ Tiago Ferreira</textarea>
   });
 })();
 </script>
-<script src="assets/js/marionete.js" defer></script>
+<script src="assets/js/marionete.js?v=poses4" defer></script>
 </body>
 </html>

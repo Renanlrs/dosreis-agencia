@@ -19,6 +19,18 @@
   const img=new Image(); img.src='assets/img/mascote-recorte.webp';
 
   let K=1; const R={x:0,y:0,tilt:0,aH:0,capeV:0,spin:0,spinV:0};
+  /* poses do vídeo de referência: OCIOSA (em pé) · EXEC (agacha, 3/4, anda) · VOO (sobe, inclina, gira) ·
+     PESADO (base larga, braços pra cima, sobe e desce) · SOLTO (mão saiu: fios caem no canto) */
+  const POSE={idle:{q:0,yaw:0,lift:0,lean:0,arms:0,walk:0,bob:0,e:.1},
+              exec:{q:.75,yaw:.62,lift:0,lean:.06,arms:.25,walk:1,bob:0,e:.5},
+              voo:{q:.15,yaw:0,lift:.09,lean:-.42,arms:.55,walk:0,bob:0,e:.75},
+              pesado:{q:.5,yaw:0,lift:0,lean:0,arms:1,walk:0,bob:1,e:.95},
+              solto:{q:0,yaw:0,lift:0,lean:0,arms:0,walk:0,bob:0,e:.05}};
+  const PZ={q:0,yaw:0,lift:0,lean:0,arms:0,walk:0,bob:0}; let mode='idle',modeAt=0,demoI=0,demoAt=0;
+  const DEMO=[['idle',2.6],['exec',3.4],['voo',3.2],['pesado',3.4],['solto',2.4]];
+  const FANS={idle:[[-62,8],[-34,-30],[-4,-44],[27,-34],[52,-6]],exec:[[-78,18],[-60,30],[-42,36],[-24,34],[6,14]],
+              voo:[[-12,8],[-6,-62],[4,6],[12,8],[20,10]],pesado:[[-12,8],[-6,-62],[4,6],[12,8],[20,10]]};
+  const fanC=FANS.idle.map(a=>a.slice());
   const D={lh:{x:0,y:0},rh:{x:0,y:0},lk:{x:0,y:0},rk:{x:0,y:0},lf:{x:0,y:0},rf:{x:0,y:0},head:{x:0,y:0}};
   let gl=null;
 
@@ -42,8 +54,12 @@
     for(const k of ['lh','rh','lk','rk','lf','rf']){const c=CT[k],ex=x-c.x,ey=y-c.y,w=Math.exp(-(ex*ex+ey*ey)/(2*c.s*c.s))*body;
       dx+=w*D[k].x; dy+=w*D[k].y}
     const cp=CT.cape,ex=x-cp.x,ey=y-cp.y; dx+=Math.exp(-(ex*ex+ey*ey)/(2*cp.s*cp.s))*sstep(430,620,y)*R.capeV;
-    const cs=Math.cos(R.spin), sx=(cs<0?-1:1)*Math.max(Math.abs(cs),.05);
-    const px=(x+dx-NECK.x)*sx, py=y+dy-NECK.y, c=Math.cos(R.tilt), s=Math.sin(R.tilt);
+    if(PZ.q>0){const q=PZ.q, ky=Math.exp(-((y-690)*(y-690))/(2*110*110));
+      dy+=q*150*(1-sstep(640,880,y));                                  // tronco desce, pés ficam no chão
+      dx+=q*78*Math.tanh((x-375)/60)*ky}                               // joelhos abrem
+    const ang=R.spin+PZ.yaw, cs=Math.cos(ang), sn=Math.sin(ang), sx=(cs<0?-1:1)*Math.max(Math.abs(cs),.05);
+    const ux=x+dx-NECK.x, z=ux*sn, pr=1400/(1400+z);                   // perspectiva: lado de lá encolhe
+    const px=ux*sx*pr, py=(y+dy-NECK.y)*pr, c=Math.cos(R.tilt), s=Math.sin(R.tilt);
     return {x:R.x+(px*c-py*s)*K, y:R.y+(px*s+py*c)*K};
   }
 
@@ -98,6 +114,10 @@
   function init(){const b=base(),h=restHand();hand.x=hand.tx=h.x;hand.y=hand.ty=h.y;R.x=b.x;R.y=b.y;
     fing.forEach((f,i)=>{f.x=h.x+FAN[i][0]*S;f.y=h.y+FAN[i][1]*S;f.vx=f.vy=0});inited=true}
 
+  const STM={idle:'OCIOSA',exec:'EXECUTANDO TAREFA',voo:'SUBINDO NOVO SISTEMA',pesado:'TRABALHO PESADO',solto:'OCIOSA'};
+  const WTM={idle:'aguardando comando',exec:'executando',voo:'gerando',pesado:'processando o lote',solto:'aguardando comando'};
+  const LOGM={idle:['i','mão aberta · agente em espera'],exec:['r','mão deitada · executando implementação'],voo:['i','1 dedo · subindo novo sistema'],
+              pesado:['r','levantando: lote pesado (1,3 mil notas)'],solto:['d','mão solta · agente volta pra base']};
   const pulses=[];
   const lerp=(a,b,k)=>a+(b-a)*k, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
@@ -108,37 +128,56 @@
       hand.ty=h0.y+Math.cos(tt*1.3*sp)*38*S+Math.sin(tt*3.1*sp)*10*S;
       if(t-ptrAt>6000&&!cam)st.classList.remove('on');
     }
+    // ----- qual pose? -----
+    let want;
+    if(camOn){ want=cam?camMode:(camHandAt>0&&t-camHandAt>700?'solto':'idle') }
+    else if(idle){ if(t-demoAt>DEMO[demoI][1]*1000){demoI=(demoI+1)%DEMO.length;demoAt=t} want=DEMO[demoI][0] }
+    else { demoAt=t;demoI=0; const v=Math.hypot(hand.tx-hand.x,hand.ty-hand.y)/S;
+      want=ptrDown?'pesado':v>60?'voo':v>14?'exec':(mode==='voo'||mode==='exec')&&t-modeAt<900?mode:'idle' }
+    if(want!==mode){mode=want;modeAt=t;nextLog=0;forceLine=LOGM[mode]}
+    const tp=POSE[mode], kp=1-Math.pow(.015,dt);
+    for(const key in PZ)PZ[key]=lerp(PZ[key],tp[key],kp);
+    if(mode==='pesado')PZ.q=lerp(PZ.q,.42+.3*Math.sin(tt*5.2),kp);   // agacha e levanta (levantando peso)
+    if(mode==='voo')PZ.yaw=lerp(PZ.yaw,Math.sin(tt*1.9)*.9,kp);        // gira no ar
+    const fz=FANS[mode]||FANS.idle; fanC.forEach((f,i)=>{f[0]=lerp(f[0],fz[i][0],kp*1.5);f[1]=lerp(f[1],fz[i][1],kp*1.5)});
     const k=1-Math.pow(.001,dt*(idle?1.4:cam?9:6));
     const px=hand.x,py=hand.y; hand.x=lerp(hand.x,hand.tx,k);hand.y=lerp(hand.y,hand.ty,k);
     const sp=Math.hypot(hand.x-px,hand.y-py)/Math.max(dt,.001)/S;
     let flex=0;
     fing.forEach((f,i)=>{
-      if(cam){const kk=1-Math.pow(.0005,dt),nx=lerp(f.x,f.tx,kk),ny=lerp(f.y,f.ty,kk);flex+=Math.hypot(nx-f.x,ny-f.y);f.x=nx;f.y=ny;return}
-      const wig=(5+14*E)*S, tx=hand.x+FAN[i][0]*S+Math.sin(tt*(3.1+i*.7)+i)*wig*.5, ty=hand.y+FAN[i][1]*S+Math.sin(tt*(4.3+i*.9)+i*2)*wig;
-      f.vx+=(tx-f.x)*180*dt; f.vy+=(ty-f.y)*180*dt; const dm=Math.pow(.0005,dt); f.vx*=dm; f.vy*=dm; f.x+=f.vx*dt; f.y+=f.vy*dt;
+      if(cam&&mode!=='solto'){const kk=1-Math.pow(.0005,dt),nx=lerp(f.x,f.tx,kk),ny=lerp(f.y,f.ty,kk);flex+=Math.hypot(nx-f.x,ny-f.y);f.x=nx;f.y=ny;return}
+      let tx,ty;
+      if(mode==='solto'){tx=(14+i*16)*S;ty=H-6*S-i*3*S}                 // fios caem no canto, sem mão
+      else{const wig=(5+14*E)*S; tx=hand.x+fanC[i][0]*S+Math.sin(tt*(3.1+i*.7)+i)*wig*.5; ty=hand.y+fanC[i][1]*S+Math.sin(tt*(4.3+i*.9)+i*2)*wig}
+      const kS=mode==='solto'?40:180; f.vx+=(tx-f.x)*kS*dt; f.vy+=(ty-f.y)*kS*dt+(mode==='solto'?900*S*dt:0); const dm=Math.pow(mode==='solto'?.02:.0005,dt); f.vx*=dm; f.vy*=dm; f.x+=f.vx*dt; f.y+=f.vy*dt;
     });
     const work=clamp(sp/900+flex/Math.max(dt,.001)/S/2500,0,1);
-    E=lerp(E,work,1-Math.pow(.02,dt)); if(idle)E=Math.max(E,.12+.1*Math.sin(tt*.7));
+    E=lerp(E,Math.max(work*.5,POSE[mode].e),1-Math.pow(.02,dt));
     // corpo pendurado: segue a mão, balança e inclina
     const b=base(), dx=hand.x-h0.x, dy=hand.y-h0.y, kb=1-Math.pow(.02,dt);
     const kf2=1-Math.pow(cam?.004:.02,dt);
-    R.x=lerp(R.x,b.x+clamp(dx*.5,-W*(mob?.12:.1),W*(mob?.12:.22)),kf2);
-    R.y=lerp(R.y,b.y+clamp(dy*.65,-H*(mob?.05:.1),H*(mob?.08:.11))+Math.sin(tt*1.6)*4*S,kf2);
-    R.tilt=lerp(R.tilt,clamp((fing[4].y-fing[0].y)*.003/S+(hand.x-px)/Math.max(dt,.001)*.00025/S,-.3,.3),kb);
+    const fol=mode==='voo'?.5:mode==='solto'?0:.18;
+    R.x=lerp(R.x,b.x+clamp(dx*fol,-W*(mob?.12:.1),W*(mob?.12:.22))-PZ.lift*W*.12,kf2);
+    R.y=lerp(R.y,b.y+clamp(dy*fol,-H*(mob?.05:.1),H*(mob?.08:.11))-PZ.lift*H+Math.sin(tt*(mode==='voo'?3:1.6))*(mode==='voo'?12:3)*S,kf2);
+    R.tilt=lerp(R.tilt,PZ.lean+(mode==='idle'||mode==='solto'?0:clamp((fing[4].y-fing[0].y)*.0015/S+(hand.x-px)/Math.max(dt,.001)*.00015/S,-.2,.2)),kb);
     // cada dedo puxa uma parte: deslocamento do dedo em relação à mão ABERTA (calibrada sozinha)
     fing.forEach((f,i)=>{const ox=f.x-hand.x,oy=f.y-hand.y;
       if(!cam){f.rx=FAN[i][0]*S;f.ry=FAN[i][1]*S;return}
       if(f.rx===undefined||f.calib){f.rx=ox;f.ry=oy;f.calib=false;return}
       const open=Math.hypot(ox,oy)>Math.hypot(f.rx,f.ry), a=1-Math.pow(open?.2:.97,dt); f.rx=lerp(f.rx,ox,a); f.ry=lerp(f.ry,oy,a)});
-    const g=cam?2.4:1.9, rel=i=>({x:(fing[i].x-hand.x-fing[i].rx)*g+dx*.12,y:(fing[i].y-hand.y-fing[i].ry)*g+dy*.12});
+    const g=(cam?2.4:1.9)*(mode==='idle'?1:.45), rel=i=>({x:(fing[i].x-hand.x-fing[i].rx)*g+dx*.12,y:(fing[i].y-hand.y-fing[i].ry)*g+dy*.12});
     const kj=1-Math.pow(.004,dt), put=(key,v,g)=>{const m=CT[key].m;D[key].x=lerp(D[key].x,clamp(v.x/K*g,-m,m),kj);D[key].y=lerp(D[key].y,clamp(v.y/K*g,-m,m),kj)};
-    put('lh',rel(0),.9); put('lk',rel(1),.6); put('rk',rel(3),.6); put('rh',rel(4),.9);
+    const A=PZ.arms, wk=Math.sin(tt*7)*PZ.walk;
+    const add=(v,ax,ay)=>({x:v.x+ax*K,y:v.y+ay*K});
+    put('lh',add(rel(0),18*A,-120*A),1); put('rh',add(rel(4),-18*A,-112*A),1);
+    put('lk',add(rel(1),0,-Math.max(0,wk)*70),.6); put('rk',add(rel(3),0,-Math.max(0,-wk)*70),.6);
     const hv=rel(2); D.head.x=lerp(D.head.x,clamp(hv.x/K*.25,-16,16),kj); D.head.y=lerp(D.head.y,clamp(hv.y/K*.25,-14,10),kj);
     R.aH=lerp(R.aH,clamp(hv.x/K*.004,-.3,.3),kj);
     // pés balançam atrasados (pendurados)
     const kf=1-Math.pow(.03,dt);
-    D.lf.x=lerp(D.lf.x,D.lk.x*1.2-R.tilt*60,kf);D.lf.y=lerp(D.lf.y,D.lk.y*.9,kf);
-    D.rf.x=lerp(D.rf.x,D.rk.x*1.2-R.tilt*60,kf);D.rf.y=lerp(D.rf.y,D.rk.y*.9,kf);
+    const dang=mode==='voo'?50:0;                                   // no voo as pernas ficam pra trás
+    D.lf.x=lerp(D.lf.x,D.lk.x*1.2-R.tilt*60+dang,kf);D.lf.y=lerp(D.lf.y,D.lk.y*.9-dang*.5,kf);
+    D.rf.x=lerp(D.rf.x,D.rk.x*1.2-R.tilt*60+dang,kf);D.rf.y=lerp(D.rf.y,D.rk.y*.9-dang*.5,kf);
     R.capeV=lerp(R.capeV,clamp(-(hand.x-px)/Math.max(dt,.001)/K*.03,-40,40)+Math.sin(tt*1.4)*8,1-Math.pow(.05,dt));
     spinGesture(t,dt,cam);
     if(!RM&&Math.random()<dt*(2+E*26))pulses.push({i:(Math.random()*5)|0,p:0,v:.7+Math.random()*.9});
@@ -153,7 +192,7 @@
       if(gHist.length>=8){let cx0=0,cy0=0;gHist.forEach(q=>{cx0+=q.x;cy0+=q.y});cx0/=gHist.length;cy0/=gHist.length;
         let rad=0;gHist.forEach(q=>rad+=Math.hypot(q.x-cx0,q.y-cy0));rad/=gHist.length;
         const a=gHist[gHist.length-1],b=gHist[gHist.length-2];
-        if(rad>14*S&&b){let d=Math.atan2(a.y-cy0,a.x-cx0)-Math.atan2(b.y-cy0,b.x-cx0);if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;
+        if(rad>60*S&&b){let d=Math.atan2(a.y-cy0,a.x-cx0)-Math.atan2(b.y-cy0,b.x-cx0);if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;
           drive=d/Math.max(a.t-b.t,8)*1000*1.2}}
     } else gHist.length=0;
     if(drive!==null){R.spinV=lerp(R.spinV,clamp(drive,-14,14),.3)}
@@ -164,7 +203,7 @@
   }
   let forceLine=null;
   function bez(a,b,i,tt){const d=Math.hypot(b.x-a.x,b.y-a.y);
-    return {x:(a.x+b.x)/2+Math.sin(tt*1.3+i)*10*S, y:(a.y+b.y)/2+d*.12+Math.cos(tt*1.1+i)*6*S}}
+    const sag=mode==='solto'?.35:.12; return {x:(a.x+b.x)/2+Math.sin(tt*1.3+i)*10*S, y:Math.min(H,(a.y+b.y)/2+d*sag+Math.cos(tt*1.1+i)*6*S)}}
   function qp(a,c,b,t){const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y}}
   const STR=[[9,'rgba(255,150,40,.07)'],[4,'rgba(255,170,60,.22)'],[1.4,'rgba(255,214,150,.95)']];
   function glow(p,r,c0,c1){const g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);g.addColorStop(0,c0);g.addColorStop(1,c1);cx.fillStyle=g;cx.beginPath();cx.arc(p.x,p.y,r,0,7);cx.fill()}
@@ -189,13 +228,13 @@
     fing.forEach(f=>{glow(f,16*S,'rgba(255,230,190,.8)','rgba(255,150,40,0)');cx.fillStyle='#fff';cx.beginPath();cx.arc(f.x,f.y,4.2*S,0,7);cx.fill()});
     cx.globalCompositeOperation='source-over';
     if(!camOn){cx.strokeStyle='rgba(255,255,255,.12)';cx.lineWidth=1;cx.beginPath();cx.arc(hand.x,hand.y+26*S,22*S,0,7);cx.stroke()}
-    hud.style.transform='translate('+((att[2].x)|0)+'px,'+((att[2].y-10*S)|0)+'px) translate(-50%,-100%)';
+    hud.style.transform='translate('+((att[2].x)|0)+'px,'+((att[2].y-10*S)|0)+'px) translate(-50%,-100%) perspective(700px) rotateY('+(-(R.spin+PZ.yaw)*.8).toFixed(3)+'rad) rotate('+(R.tilt*.8).toFixed(3)+'rad)';
   }
 
   /* ---------- câmera + MediaPipe Hands (tudo roda no aparelho, nada é enviado) ---------- */
   const MP='https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.0';
   const MODEL='https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
-  let lm=null,stream=null,lastVT=-1;
+  let lm=null,stream=null,lastVT=-1,camMode='idle',camCand='idle',camCandAt=0,vooAt=-1e9,camPrev=null,camPrevT=0,camSpd=0;
   const TIPS=[4,8,12,16,20];
   function say(m){camMsg.textContent=m;camMsg.classList.toggle('vis',!!m)}
   async function camStart(){
@@ -224,13 +263,20 @@
     const vw=vid.videoWidth,vh=vid.videoHeight,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;
     const P=p=>({x:ox+(1-p.x)*dw,y:oy+p.y*dh});
     const palm=P(L[9]); hand.tx=palm.x; hand.ty=palm.y;
+    const hs=camPrev?Math.hypot(palm.x-camPrev.x,palm.y-camPrev.y)/Math.max(t-camPrevT,1)*1000/S:0; camSpd=lerp(camSpd,hs,.3);
     const dd=(a,b)=>Math.hypot(L[a].x-L[b].x,L[a].y-L[b].y), ext=(tip,pip)=>dd(0,tip)>dd(0,pip)*1.12;
     const pointing=ext(8,6)&&!ext(12,10)&&!ext(16,14)&&!ext(20,18);
+    const hx=L[9].x-L[0].x, hy=L[9].y-L[0].y;                          // punho -> base do dedo médio
+    const palmDown=Math.abs(hx)>Math.abs(hy)*1.05||hy>0;              // mão deitada (controle de marionete)
+    let cand=pointing?(camSpd>260?'voo':'pesado'):palmDown?'exec':'idle';
+    if(cand==='voo')vooAt=t; else if(pointing&&t-vooAt<1200)cand='voo';   // voo segura um pouco
+    if(cand!==camCand){camCand=cand;camCandAt=t}
+    if(t-camCandAt>230)camMode=camCand;                                   // gesto precisa durar ~0,25 s
     pointFr=pointing?pointFr+1:0; gPt=P(L[8]);
     const tips=TIPS.map(i=>P(L[i])).sort((a,b)=>a.x-b.x);   // esquerda->direita: fios não cruzam
     tips.forEach((p,i)=>{fing[i].tx=p.x;fing[i].ty=p.y});
     if(t-camHandAt>700){fing.forEach(f=>{f.x=f.tx;f.y=f.ty;f.calib=true});hand.x=palm.x;hand.y=palm.y;say('')}
-    camHandAt=t; track.textContent='[ok] mão rastreada'; st.classList.add('on');
+    camPrev=palm;camPrevT=t; camHandAt=t; track.textContent='[ok] mão rastreada'; st.classList.add('on');
   }
 
   /* ---------- terminal e status ---------- */
@@ -247,10 +293,10 @@
     if(c==='b'){bi=(bi+1)%5;el.textContent='█'.repeat(2+bi)+'░'.repeat(6-bi)+' '+(8+bi*8)+'/40 lotes'}
     else el.textContent=(c==='i'?'▸ ':c==='d'?'✓ ':'· ')+it[1];
     log.appendChild(el);while(log.children.length>14)log.firstChild.remove();
-    wait.textContent=E>.35?'trabalhando pesado':E>.08?'executando':'aguardando comando';
+    wait.textContent=WTM[mode];
   }
-  function status(){const busy=E>.35;hud.classList.toggle('busy',busy);
-    stEl.textContent=Math.abs(R.spinV)>1.5?'GIRANDO':busy?'TRABALHANDO PESADO':E>.08?'EXECUTANDO':'OCIOSA';bar.style.width=(8+E*92).toFixed(0)+'%'}
+  function status(){const busy=mode==='pesado'||mode==='voo';hud.classList.toggle('busy',busy);
+    stEl.textContent=Math.abs(R.spinV)>1.5?'GIRANDO':STM[mode];bar.style.width=(8+E*92).toFixed(0)+'%'}
 
   function loop(t){const dt=Math.min((t-last)/1000,.05);last=t;trackHand(t);step(t,dt);draw(t);tick(t);status();raf=requestAnimationFrame(loop)}
   function start(){if(raf)return;size();if(!inited)init();last=performance.now();raf=requestAnimationFrame(loop)}
