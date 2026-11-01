@@ -775,6 +775,19 @@
   .pup::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
        background:radial-gradient(70% 60% at 50% 50%,transparent 55%,rgba(0,0,0,.7));z-index:3}
   .pup-cv{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+  .pup-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);z-index:0;opacity:0;transition:opacity .6s;filter:brightness(.55) contrast(1.05) saturate(.85)}
+  .pup.cam .pup-vid{opacity:1}
+  .pup-gl{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none}
+  .pup-cv{z-index:2!important;pointer-events:none}
+  .pup-camwrap{position:absolute;z-index:5;right:clamp(12px,3vw,34px);bottom:clamp(14px,3vw,30px);display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .pup-cam{cursor:pointer;font:600 12.5px/1 Inter,sans-serif;color:#03130a;background:var(--green);border:none;border-radius:99px;padding:11px 18px;
+       box-shadow:0 0 24px rgba(124,255,57,.35);transition:transform .2s var(--ease),opacity .2s}
+  .pup-cam:hover{transform:translateY(-1px)}.pup-cam:disabled{opacity:.6;cursor:wait}
+  .pup.cam .pup-cam{background:rgba(255,255,255,.1);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.3)}
+  .pup-cam-msg{font-size:12px;color:#fff;background:rgba(0,0,0,.55);padding:5px 10px;border-radius:8px;display:none}
+  .pup-cam-msg.vis{display:inline-block}
+  .pup-camwrap small{font-size:10.5px;color:var(--fg3)}
+  .pup.cam{cursor:auto}.pup.cam .pup-tip{opacity:0}
   .pup-hud{position:absolute;z-index:4;left:0;top:0;transform:translate(-50%,-100%);font:600 10.5px/1.5 ui-monospace,'SFMono-Regular',Consolas,monospace;
        color:#ff9a3c;letter-spacing:.08em;padding:8px 11px;border:1px solid rgba(255,154,60,.55);border-radius:4px;
        background:rgba(20,10,4,.55);backdrop-filter:blur(4px);box-shadow:0 0 18px rgba(255,140,40,.18);white-space:nowrap;pointer-events:none}
@@ -799,9 +812,10 @@
   .pup.on .pup-tip{opacity:0}
   .pt-m{display:none}@media(hover:none){.pt-d{display:none}.pt-m{display:inline}}
   @media(max-width:760px){
-    .pup{height:620px;cursor:auto}
+    .pup{height:660px;cursor:auto}
     .pup-term{left:12px;right:12px;width:auto;top:auto;bottom:44px;font-size:10.5px}
     .pup-log{height:8em}
+    .pup-camwrap{bottom:244px;left:50%;right:auto;transform:translateX(-50%);align-items:center}.pup-camwrap small{display:none}
   }
 </style>
 </head>
@@ -1266,9 +1280,11 @@ Tiago Ferreira</textarea>
   <div class="pup-head rv">
     <span class="kicker">IA dentro do sistema</span>
     <h3 class="pup-title">Você dá o comando.<br><span class="gl">Os agentes fazem o trabalho.</span></h3>
-    <p class="body">Estoque, nota, cobrança e atendimento rodando sozinhos enquanto você cuida do que importa. Mexa o mouse — ou o dedo — e conduza o agente.</p>
+    <p class="body">Estoque, nota, cobrança e atendimento rodando sozinhos enquanto você cuida do que importa. Ative a câmera e conduza o agente com os dedos — ou use o mouse.</p>
   </div>
   <div class="pup rv" id="pup" aria-label="Animação: agente de IA conduzido por fios, trabalhando nas tarefas do ERP">
+    <video class="pup-vid" playsinline muted></video>
+    <canvas class="pup-gl"></canvas>
     <canvas class="pup-cv"></canvas>
     <div class="pup-hud" aria-hidden="true">
       <div class="pup-hud-l"><b>AGENTE</b> · <span>DOS REIS</span></div>
@@ -1277,10 +1293,11 @@ Tiago Ferreira</textarea>
     </div>
     <div class="pup-term" aria-hidden="true">
       <div class="pup-term-top"><span>dosreis@erp</span> <b>agente --acompanhar</b></div>
-      <div class="pup-term-sub"><span>[ok] mão rastreada</span> <span>agente DOS-REIS-01</span></div>
+      <div class="pup-term-sub"><span class="pup-track">[--] sem câmera · usando o cursor</span> <span>agente DOS-REIS-01</span></div>
       <div class="pup-term-st">[<span class="pup-term-wait">aguardando comando</span>]</div>
       <div class="pup-log"></div>
     </div>
+    <div class="pup-camwrap"><button type="button" class="pup-cam">Ativar câmera</button><span class="pup-cam-msg"></span><small>a imagem fica só no seu aparelho</small></div>
     <span class="pup-tip"><span class="pt-d">mexa o cursor aqui</span><span class="pt-m">arraste o dedo aqui</span></span>
   </div>
 </div>
