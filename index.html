@@ -271,6 +271,21 @@
   .sist .sig img{height:100%;width:auto;max-width:150px;object-fit:contain;display:block}
   .sist .sig.dark{background:#020403;box-shadow:0 0 30px rgba(124,255,57,.22),inset 0 0 0 1px rgba(124,255,57,.25)}
   .sist .sig.full{padding:0;overflow:hidden}
+  .sist{overflow:hidden}
+  .sist-media{position:relative;margin:-26px -24px 0;aspect-ratio:16/10;overflow:hidden;background:#050805;
+        border-bottom:1px solid rgba(124,255,57,.18)}
+  .sist-media video,.sist-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease),filter .6s}
+  .sist-media::after{content:"";position:absolute;inset:0;pointer-events:none;
+        background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.72)),radial-gradient(120% 90% at 50% 0,rgba(0,0,0,0) 60%,rgba(0,0,0,.35))}
+  .sist-media .live{position:absolute;top:12px;left:12px;z-index:2;display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.18em;
+        text-transform:uppercase;color:#fff;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);
+        padding:5px 9px;border-radius:99px}
+  .sist-media .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:sistPulse 1.6s infinite}
+  @keyframes sistPulse{50%{opacity:.25}}
+  .sist:hover .sist-media video{transform:scale(1.06)}
+  .sist .sig{position:relative;z-index:2;margin-top:-44px}
+  @media(min-width:981px){.sist-grid .sist:nth-child(n+4) .sist-media{aspect-ratio:2/1}}
+  @media (prefers-reduced-motion:reduce){.sist-media .live::before{animation:none}}
   .sist .tg{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--green);font-weight:600}
   .sist h3{font-size:22px;font-weight:500;letter-spacing:-.02em}
   .sist p{font-size:14px;line-height:1.6;color:var(--fg2)}
@@ -1267,15 +1282,15 @@ Tiago Ferreira</textarea>
     <p class="body">Além de marketing, a DOS REIS tem sistemas prontos para quem já passou da fase do caderninho. A gente instala, treina sua equipe e continua por perto.</p>
   </div>
   <div class="sist-grid">
-    <article class="sist rv"><span class="sig full"><img src="assets/img/sistemas/acqua-belo.webp" alt="Logo Acqua Belo" width="160" height="160" loading="lazy"></span><span class="tg">Projeto 3D da obra</span><h3>Acqua Belo</h3><p>Planta cotada, 3D, fachada, corte e orçamento da obra em um lugar só. O cliente vê a obra pronta antes do primeiro tijolo.</p><ul><li>Empreiteiro e construtora</li><li>Piscina e reforma</li><li>Obra em condomínio</li></ul>
+    <article class="sist rv"><div class="sist-media"><video muted loop playsinline preload="none" poster="assets/video/sistemas/acqua-belo.jpg" data-src="assets/video/sistemas/acqua-belo.mp4" aria-label="Animação: Obra do terreno à piscina"></video><span class="live">Obra do terreno à piscina</span></div><span class="sig"><img src="assets/img/sistemas/acqua-belo.webp" alt="Logo Acqua Belo" width="160" height="160" loading="lazy"></span><span class="tg">Projeto 3D da obra</span><h3>Acqua Belo</h3><p>Planta cotada, 3D, fachada, corte e orçamento da obra em um lugar só. O cliente vê a obra pronta antes do primeiro tijolo.</p><ul><li>Empreiteiro e construtora</li><li>Piscina e reforma</li><li>Obra em condomínio</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Acqua%20Belo%20%28projeto%203D%20de%20obra%29." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig"><img src="assets/img/sistemas/dosreis-financeiro.webp" alt="Logo Dos Reis Financeiro" width="160" height="160" loading="lazy"></span><span class="tg">Dinheiro organizado</span><h3>Dos Reis Financeiro</h3><p>Contas a pagar e a receber, fluxo de caixa e cobrança no WhatsApp. Você sabe quanto entrou, quanto sai e quem está devendo.</p><ul><li>MEI e microempresa</li><li>Prestador de serviço</li><li>Quem vende fiado</li></ul>
+    <article class="sist rv"><div class="sist-media"><video muted loop playsinline preload="none" poster="assets/video/sistemas/dosreis-financeiro.jpg" data-src="assets/video/sistemas/dosreis-financeiro.mp4" aria-label="Animação: Reis Factory"></video><span class="live">Reis Factory</span></div><span class="sig"><img src="assets/img/sistemas/dosreis-financeiro.webp" alt="Logo Dos Reis Financeiro" width="160" height="160" loading="lazy"></span><span class="tg">Dinheiro organizado</span><h3>Dos Reis Financeiro</h3><p>Contas a pagar e a receber, fluxo de caixa e cobrança no WhatsApp. Você sabe quanto entrou, quanto sai e quem está devendo.</p><ul><li>MEI e microempresa</li><li>Prestador de serviço</li><li>Quem vende fiado</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Dos%20Reis%20Financeiro." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig dark"><img src="assets/img/sistemas/speak-easy.webp" alt="Logo Speak Easy" width="160" height="160" loading="lazy"></span><span class="tg">Inglês com professora virtual</span><h3>Speak Easy</h3><p>Aulas curtas de conversação no celular, com professora em vídeo e progresso salvo. Para a equipe atender turista e cliente de fora.</p><ul><li>Comércio e turismo</li><li>Equipe de atendimento</li><li>Quem quer viajar</li></ul>
+    <article class="sist rv"><div class="sist-media"><video muted loop playsinline preload="none" poster="assets/video/sistemas/speak-easy.jpg" data-src="assets/video/sistemas/speak-easy.mp4" aria-label="Animação: Professora Samara"></video><span class="live">Professora Samara</span></div><span class="sig dark"><img src="assets/img/sistemas/speak-easy.webp" alt="Logo Speak Easy" width="160" height="160" loading="lazy"></span><span class="tg">Inglês com professora virtual</span><h3>Speak Easy</h3><p>Aulas curtas de conversação no celular, com professora em vídeo e progresso salvo. Para a equipe atender turista e cliente de fora.</p><ul><li>Comércio e turismo</li><li>Equipe de atendimento</li><li>Quem quer viajar</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Speak%20Easy%20%28ingl%C3%AAs%29." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig"><img src="assets/img/sistemas/torres-viana.webp" alt="Logo Torres Viana ERP" width="160" height="160" loading="lazy"></span><span class="tg">Gestão completa da loja</span><h3>Torres Viana ERP</h3><p>Estoque, vendas, caixa, compras e atendimento no WhatsApp com IA. Feito para farmácia, mercado e distribuidora que precisam de controle de verdade.</p><ul><li>Farmácia e drogaria</li><li>Mercado e distribuidora</li><li>Loja com estoque</li></ul>
+    <article class="sist rv"><div class="sist-media"><video muted loop playsinline preload="none" poster="assets/video/sistemas/torres-viana.jpg" data-src="assets/video/sistemas/torres-viana.mp4" aria-label="Animação: Drogaria MenorPreço"></video><span class="live">Drogaria MenorPreço</span></div><span class="sig"><img src="assets/img/sistemas/torres-viana.webp" alt="Logo Torres Viana ERP" width="160" height="160" loading="lazy"></span><span class="tg">Gestão completa da loja</span><h3>Torres Viana ERP</h3><p>Estoque, vendas, caixa, compras e atendimento no WhatsApp com IA. Feito para farmácia, mercado e distribuidora que precisam de controle de verdade.</p><ul><li>Farmácia e drogaria</li><li>Mercado e distribuidora</li><li>Loja com estoque</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Torres%20Viana%20ERP." target="_blank" rel="noopener">Quero uma demonstração</a></article>
-    <article class="sist rv"><span class="sig"><img src="assets/img/sistemas/logistica.webp" alt="Logo Logística Inteligente" width="160" height="160" loading="lazy"></span><span class="tg">Frete e entrega sob controle</span><h3>Logística Inteligente</h3><p>Cotação de frete, ordem de coleta, frota própria, rastreio por GPS e torre de controle das entregas.</p><ul><li>Transportadora</li><li>Distribuidora de bebidas</li><li>Quem entrega todo dia</li></ul>
+    <article class="sist rv"><div class="sist-media"><video muted loop playsinline preload="none" poster="assets/video/sistemas/logistica.jpg" data-src="assets/video/sistemas/logistica.mp4" aria-label="Animação: Torres Fleet"></video><span class="live">Torres Fleet</span></div><span class="sig"><img src="assets/img/sistemas/logistica.webp" alt="Logo Logística Inteligente" width="160" height="160" loading="lazy"></span><span class="tg">Frete e entrega sob controle</span><h3>Logística Inteligente</h3><p>Cotação de frete, ordem de coleta, frota própria, rastreio por GPS e torre de controle das entregas.</p><ul><li>Transportadora</li><li>Distribuidora de bebidas</li><li>Quem entrega todo dia</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20a%20Log%C3%ADstica%20Inteligente." target="_blank" rel="noopener">Quero uma demonstração</a></article>
   </div>
 
@@ -1988,5 +2003,16 @@ Tiago Ferreira</textarea>
 })();
 </script>
 <script src="assets/js/marionete.js?v=rig2" defer></script>
+<script>
+/* vídeos dos Sistemas: baixam e tocam só quando aparecem; pausam fora da tela */
+(function(){
+  const vs=[...document.querySelectorAll('.sist-media video')]; if(!vs.length)return;
+  const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target;
+    if(e.isIntersecting){ if(!v.src){v.src=v.dataset.src} if(!rm)v.play().catch(()=>{}) } else v.pause()
+  }),{rootMargin:'200px 0px',threshold:.15});
+  vs.forEach(v=>io.observe(v));
+})();
+</script>
 </body>
 </html>
