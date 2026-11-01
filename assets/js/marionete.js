@@ -13,12 +13,12 @@
 
   /* ---------- imagem do mascote (587x926) e pontos de controle em px da imagem ---------- */
   const IW=587, IH=926, NECK={x:330,y:300};
-  const CT={lh:{x:112,y:332,s:88,m:52}, rh:{x:522,y:410,s:80,m:46}, lk:{x:288,y:690,s:100,m:46}, rk:{x:440,y:702,s:100,m:46},
-            lf:{x:236,y:872,s:92,m:60}, rf:{x:462,y:868,s:92,m:60}, cape:{x:70,y:700,s:170}};
+  const CT={lh:{x:112,y:332,s:108,m:115}, rh:{x:522,y:410,s:98,m:105}, lk:{x:288,y:690,s:112,m:85}, rk:{x:440,y:702,s:112,m:85},
+            lf:{x:236,y:872,s:96,m:115}, rf:{x:462,y:868,s:96,m:115}, cape:{x:70,y:700,s:170}};
   const CROWN={x:345,y:24}, EYES=[{x:296,y:196},{x:404,y:206}], LOGO={x:396,y:410};
   const img=new Image(); img.src='assets/img/mascote-recorte.webp';
 
-  let K=1; const R={x:0,y:0,tilt:0,aH:0,capeV:0};
+  let K=1; const R={x:0,y:0,tilt:0,aH:0,capeV:0,spin:0,spinV:0};
   const D={lh:{x:0,y:0},rh:{x:0,y:0},lk:{x:0,y:0},rk:{x:0,y:0},lf:{x:0,y:0},rf:{x:0,y:0},head:{x:0,y:0}};
   let gl=null;
 
@@ -30,7 +30,7 @@
     if(gl)gl.viewport(0,0,gc.width,gc.height);
   }
   const base=()=>mob?{x:W*.46,y:H*.11+NECK.y*K}:{x:W*.27,y:H*.09+NECK.y*K};
-  const restHand=()=>mob?{x:W*.76,y:H*.16}:{x:W*.5,y:H*.26};
+  const restHand=()=>camOn?(mob?{x:W*.5,y:H*.3}:{x:W*.55,y:H*.4}):(mob?{x:W*.76,y:H*.16}:{x:W*.5,y:H*.26});
 
   /* ---------- deformação: ponto da imagem -> tela ---------- */
   const sstep=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t)};
@@ -42,18 +42,19 @@
     for(const k of ['lh','rh','lk','rk','lf','rf']){const c=CT[k],ex=x-c.x,ey=y-c.y,w=Math.exp(-(ex*ex+ey*ey)/(2*c.s*c.s))*body;
       dx+=w*D[k].x; dy+=w*D[k].y}
     const cp=CT.cape,ex=x-cp.x,ey=y-cp.y; dx+=Math.exp(-(ex*ex+ey*ey)/(2*cp.s*cp.s))*sstep(430,620,y)*R.capeV;
-    const px=x+dx-NECK.x, py=y+dy-NECK.y, c=Math.cos(R.tilt), s=Math.sin(R.tilt);
+    const cs=Math.cos(R.spin), sx=(cs<0?-1:1)*Math.max(Math.abs(cs),.05);
+    const px=(x+dx-NECK.x)*sx, py=y+dy-NECK.y, c=Math.cos(R.tilt), s=Math.sin(R.tilt);
     return {x:R.x+(px*c-py*s)*K, y:R.y+(px*s+py*c)*K};
   }
 
   /* ---------- WebGL: malha texturizada ---------- */
-  const NX=22, NY=34; let prog,posBuf,pos,nIdx=0,texOK=false,resLoc;
+  const NX=22, NY=34; let prog,posBuf,pos,nIdx=0,texOK=false,resLoc,shLoc;
   (function initGL(){
     gl=gc.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:true}); if(!gl)return;
     const sh=(t,src)=>{const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s};
     prog=gl.createProgram();
     gl.attachShader(prog,sh(gl.VERTEX_SHADER,'attribute vec2 p;attribute vec2 uv;uniform vec2 res;varying vec2 v;void main(){vec2 c=p/res*2.0-1.0;gl_Position=vec4(c.x,-c.y,0.0,1.0);v=uv;}'));
-    gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec2 v;uniform sampler2D t;void main(){gl_FragColor=texture2D(t,v);}'));
+    gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec2 v;uniform sampler2D t;uniform float sh;void main(){vec4 c=texture2D(t,v);gl_FragColor=vec4(c.rgb*sh+vec3(.03,.16,.01)*c.a*(1.0-sh),c.a);}'));
     gl.linkProgram(prog);gl.useProgram(prog);
     const uv=new Float32Array((NX+1)*(NY+1)*2); for(let j=0;j<=NY;j++)for(let i=0;i<=NX;i++){const o=(j*(NX+1)+i)*2;uv[o]=i/NX;uv[o+1]=j/NY}
     const ub=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,ub);gl.bufferData(gl.ARRAY_BUFFER,uv,gl.STATIC_DRAW);
@@ -62,7 +63,7 @@
     const pl=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(pl);gl.vertexAttribPointer(pl,2,gl.FLOAT,false,0,0);
     const idx=[];for(let j=0;j<NY;j++)for(let i=0;i<NX;i++){const a=j*(NX+1)+i,b=a+1,c=a+NX+1,d=c+1;idx.push(a,b,c,b,d,c)}
     const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(idx),gl.STATIC_DRAW);nIdx=idx.length;
-    resLoc=gl.getUniformLocation(prog,'res');
+    resLoc=gl.getUniformLocation(prog,'res'); shLoc=gl.getUniformLocation(prog,'sh');
     gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
     const tex=gl.createTexture();
     const up=()=>{gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
@@ -71,13 +72,14 @@
       gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);texOK=true};
     if(img.complete&&img.naturalWidth)up();else img.addEventListener('load',up);
   })();
+  const front=()=>{const c=Math.cos(R.spin);return .26+.74*sstep(-.15,.2,c)};
   function drawMascot(){
     if(gl){ if(!texOK)return;
       for(let j=0;j<=NY;j++)for(let i=0;i<=NX;i++){const p=warp(i/NX*IW,j/NY*IH),o=(j*(NX+1)+i)*2;pos[o]=p.x;pos[o+1]=p.y}
-      gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(resLoc,W,H);
+      gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(resLoc,W,H);gl.uniform1f(shLoc,front());
       gl.bindBuffer(gl.ARRAY_BUFFER,posBuf);gl.bufferSubData(gl.ARRAY_BUFFER,0,pos);gl.drawElements(gl.TRIANGLES,nIdx,gl.UNSIGNED_SHORT,0);
     } else if(img.complete){ // sem WebGL: imagem inteira balançando
-      const o=warp(0,0);cx.save();cx.translate(o.x,o.y);cx.rotate(R.tilt);cx.drawImage(img,0,0,IW*K,IH*K);cx.restore();
+      const o=warp(0,0),cs=Math.cos(R.spin);cx.save();cx.translate(o.x,o.y);cx.rotate(R.tilt);cx.scale((cs<0?-1:1)*Math.max(Math.abs(cs),.05),1);cx.drawImage(img,0,0,IW*K,IH*K);cx.restore();
     }
   }
 
@@ -85,9 +87,11 @@
   const hand={x:0,y:0,tx:0,ty:0}; let ptrAt=-1e9,E=0,camOn=false,camHandAt=-1e9;
   const FAN=[[-62,8],[-34,-30],[-4,-44],[27,-34],[52,-6]];
   const fing=FAN.map(()=>({x:0,y:0,vx:0,vy:0,tx:0,ty:0}));
+  let ptrDown=false; const gHist=[]; let gPt=null, pointFr=0;
+  st.addEventListener('pointerup',()=>{ptrDown=false},{passive:true}); addEventListener('pointerup',()=>{ptrDown=false});
   function setPtr(e){if(camOn&&performance.now()-camHandAt<1200)return;const r=st.getBoundingClientRect();hand.tx=e.clientX-r.left;hand.ty=e.clientY-r.top;ptrAt=performance.now();st.classList.add('on')}
   st.addEventListener('pointermove',setPtr,{passive:true});
-  st.addEventListener('pointerdown',e=>{if(e.target.closest('.pup-cam'))return;setPtr(e)},{passive:true});
+  st.addEventListener('pointerdown',e=>{if(e.target.closest('.pup-cam'))return;ptrDown=true;setPtr(e)},{passive:true});
   st.addEventListener('pointerleave',()=>{ptrAt=performance.now()-2000});
 
   let inited=false;
@@ -117,11 +121,16 @@
     E=lerp(E,work,1-Math.pow(.02,dt)); if(idle)E=Math.max(E,.12+.1*Math.sin(tt*.7));
     // corpo pendurado: segue a mão, balança e inclina
     const b=base(), dx=hand.x-h0.x, dy=hand.y-h0.y, kb=1-Math.pow(.02,dt);
-    R.x=lerp(R.x,b.x+clamp(dx*.14,-60*S,60*S),kb);
-    R.y=lerp(R.y,b.y+clamp(dy*.18,-40*S,36*S)+Math.sin(tt*1.6)*4*S,kb);
-    R.tilt=lerp(R.tilt,clamp((fing[4].y-fing[0].y)*.0025/S+dx*.0005/S,-.22,.22),kb);
-    // cada dedo puxa uma parte (deslocamento em px da imagem)
-    const rel=i=>({x:(fing[i].x-hand.x-FAN[i][0]*S)*1.3+dx*.22,y:(fing[i].y-hand.y-FAN[i][1]*S)*1.3+dy*.22});
+    const kf2=1-Math.pow(cam?.004:.02,dt);
+    R.x=lerp(R.x,b.x+clamp(dx*.5,-W*(mob?.12:.1),W*(mob?.12:.22)),kf2);
+    R.y=lerp(R.y,b.y+clamp(dy*.65,-H*(mob?.05:.1),H*(mob?.08:.11))+Math.sin(tt*1.6)*4*S,kf2);
+    R.tilt=lerp(R.tilt,clamp((fing[4].y-fing[0].y)*.003/S+(hand.x-px)/Math.max(dt,.001)*.00025/S,-.3,.3),kb);
+    // cada dedo puxa uma parte: deslocamento do dedo em relação à mão ABERTA (calibrada sozinha)
+    fing.forEach((f,i)=>{const ox=f.x-hand.x,oy=f.y-hand.y;
+      if(!cam){f.rx=FAN[i][0]*S;f.ry=FAN[i][1]*S;return}
+      if(f.rx===undefined||f.calib){f.rx=ox;f.ry=oy;f.calib=false;return}
+      const open=Math.hypot(ox,oy)>Math.hypot(f.rx,f.ry), a=1-Math.pow(open?.2:.97,dt); f.rx=lerp(f.rx,ox,a); f.ry=lerp(f.ry,oy,a)});
+    const g=cam?2.4:1.9, rel=i=>({x:(fing[i].x-hand.x-fing[i].rx)*g+dx*.12,y:(fing[i].y-hand.y-fing[i].ry)*g+dy*.12});
     const kj=1-Math.pow(.004,dt), put=(key,v,g)=>{const m=CT[key].m;D[key].x=lerp(D[key].x,clamp(v.x/K*g,-m,m),kj);D[key].y=lerp(D[key].y,clamp(v.y/K*g,-m,m),kj)};
     put('lh',rel(0),.9); put('lk',rel(1),.6); put('rk',rel(3),.6); put('rh',rel(4),.9);
     const hv=rel(2); D.head.x=lerp(D.head.x,clamp(hv.x/K*.25,-16,16),kj); D.head.y=lerp(D.head.y,clamp(hv.y/K*.25,-14,10),kj);
@@ -131,10 +140,29 @@
     D.lf.x=lerp(D.lf.x,D.lk.x*1.2-R.tilt*60,kf);D.lf.y=lerp(D.lf.y,D.lk.y*.9,kf);
     D.rf.x=lerp(D.rf.x,D.rk.x*1.2-R.tilt*60,kf);D.rf.y=lerp(D.rf.y,D.rk.y*.9,kf);
     R.capeV=lerp(R.capeV,clamp(-(hand.x-px)/Math.max(dt,.001)/K*.03,-40,40)+Math.sin(tt*1.4)*8,1-Math.pow(.05,dt));
+    spinGesture(t,dt,cam);
     if(!RM&&Math.random()<dt*(2+E*26))pulses.push({i:(Math.random()*5)|0,p:0,v:.7+Math.random()*.9});
     for(let j=pulses.length-1;j>=0;j--){pulses[j].p+=pulses[j].v*dt*(1+E*1.5);if(pulses[j].p>1)pulses.splice(j,1)}
   }
 
+  let spinLogged=0;
+  function spinGesture(t,dt,cam){
+    const gp=cam?(pointFr>=3?gPt:null):(ptrDown&&t-ptrAt<300?{x:hand.tx,y:hand.ty}:null);
+    let drive=null;
+    if(gp){gHist.push({x:gp.x,y:gp.y,t}); while(gHist.length&&t-gHist[0].t>700)gHist.shift();
+      if(gHist.length>=8){let cx0=0,cy0=0;gHist.forEach(q=>{cx0+=q.x;cy0+=q.y});cx0/=gHist.length;cy0/=gHist.length;
+        let rad=0;gHist.forEach(q=>rad+=Math.hypot(q.x-cx0,q.y-cy0));rad/=gHist.length;
+        const a=gHist[gHist.length-1],b=gHist[gHist.length-2];
+        if(rad>14*S&&b){let d=Math.atan2(a.y-cy0,a.x-cx0)-Math.atan2(b.y-cy0,b.x-cx0);if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;
+          drive=d/Math.max(a.t-b.t,8)*1000*1.2}}
+    } else gHist.length=0;
+    if(drive!==null){R.spinV=lerp(R.spinV,clamp(drive,-14,14),.3)}
+    else R.spinV*=Math.pow(.25,dt);
+    R.spin+=R.spinV*dt;
+    if(Math.abs(R.spinV)<.6){const tgt=Math.round(R.spin/(2*Math.PI))*2*Math.PI;R.spin=lerp(R.spin,tgt,1-Math.pow(.08,dt))}
+    if(Math.abs(R.spinV)>2&&t-spinLogged>2500){spinLogged=t;nextLog=0;forceLine=['i','gesto: girar 360° · agente obedeceu']}
+  }
+  let forceLine=null;
   function bez(a,b,i,tt){const d=Math.hypot(b.x-a.x,b.y-a.y);
     return {x:(a.x+b.x)/2+Math.sin(tt*1.3+i)*10*S, y:(a.y+b.y)/2+d*.12+Math.cos(tt*1.1+i)*6*S}}
   function qp(a,c,b,t){const u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y}}
@@ -148,9 +176,9 @@
     const att=[warp(CT.lh.x,CT.lh.y),warp(CT.lk.x,CT.lk.y),warp(CROWN.x,CROWN.y),warp(CT.rk.x,CT.rk.y),warp(CT.rh.x,CT.rh.y)];
     cx.globalCompositeOperation='lighter';
     // olhos e logo acendem com o trabalho
-    const pe=.3+.3*E+.08*Math.sin(tt*5);
+    const fr=Math.max(0,Math.cos(R.spin)), pe=(.3+.3*E+.08*Math.sin(tt*5))*fr;
     EYES.forEach(e=>glow(warp(e.x,e.y),36*K,'rgba(255,220,90,'+pe.toFixed(2)+')','rgba(255,200,60,0)'));
-    glow(warp(LOGO.x,LOGO.y),60*K,'rgba(124,255,57,'+(.1+.25*E).toFixed(2)+')','rgba(124,255,57,0)');
+    glow(warp(LOGO.x,LOGO.y),60*K,'rgba(124,255,57,'+((.1+.25*E)*fr).toFixed(2)+')','rgba(124,255,57,0)');
     // fios dourados
     cx.lineCap='round';
     fing.forEach((a,i)=>{const b=att[i],c=bez(a,b,i,tt);
@@ -196,9 +224,12 @@
     const vw=vid.videoWidth,vh=vid.videoHeight,sc=Math.max(W/vw,H/vh),dw=vw*sc,dh=vh*sc,ox=(W-dw)/2,oy=(H-dh)/2;
     const P=p=>({x:ox+(1-p.x)*dw,y:oy+p.y*dh});
     const palm=P(L[9]); hand.tx=palm.x; hand.ty=palm.y;
+    const dd=(a,b)=>Math.hypot(L[a].x-L[b].x,L[a].y-L[b].y), ext=(tip,pip)=>dd(0,tip)>dd(0,pip)*1.12;
+    const pointing=ext(8,6)&&!ext(12,10)&&!ext(16,14)&&!ext(20,18);
+    pointFr=pointing?pointFr+1:0; gPt=P(L[8]);
     const tips=TIPS.map(i=>P(L[i])).sort((a,b)=>a.x-b.x);   // esquerda->direita: fios não cruzam
     tips.forEach((p,i)=>{fing[i].tx=p.x;fing[i].ty=p.y});
-    if(t-camHandAt>700){fing.forEach(f=>{f.x=f.tx;f.y=f.ty});hand.x=palm.x;hand.y=palm.y;say('')}
+    if(t-camHandAt>700){fing.forEach(f=>{f.x=f.tx;f.y=f.ty;f.calib=true});hand.x=palm.x;hand.y=palm.y;say('')}
     camHandAt=t; track.textContent='[ok] mão rastreada'; st.classList.add('on');
   }
 
@@ -212,14 +243,14 @@
   let ti=0,nextLog=0,bi=0;
   function tick(t){
     if(t<nextLog)return; nextLog=t+lerp(1500,240,E);
-    const it=TASKS[ti++%TASKS.length],c=it[0],el=document.createElement('div');el.className=c==='b'?'r':c;
+    const it=forceLine||TASKS[ti++%TASKS.length],c=it[0],el=document.createElement('div');forceLine=null;el.className=c==='b'?'r':c;
     if(c==='b'){bi=(bi+1)%5;el.textContent='█'.repeat(2+bi)+'░'.repeat(6-bi)+' '+(8+bi*8)+'/40 lotes'}
     else el.textContent=(c==='i'?'▸ ':c==='d'?'✓ ':'· ')+it[1];
     log.appendChild(el);while(log.children.length>14)log.firstChild.remove();
     wait.textContent=E>.35?'trabalhando pesado':E>.08?'executando':'aguardando comando';
   }
   function status(){const busy=E>.35;hud.classList.toggle('busy',busy);
-    stEl.textContent=busy?'TRABALHANDO PESADO':E>.08?'EXECUTANDO':'OCIOSA';bar.style.width=(8+E*92).toFixed(0)+'%'}
+    stEl.textContent=Math.abs(R.spinV)>1.5?'GIRANDO':busy?'TRABALHANDO PESADO':E>.08?'EXECUTANDO':'OCIOSA';bar.style.width=(8+E*92).toFixed(0)+'%'}
 
   function loop(t){const dt=Math.min((t-last)/1000,.05);last=t;trackHand(t);step(t,dt);draw(t);tick(t);status();raf=requestAnimationFrame(loop)}
   function start(){if(raf)return;size();if(!inited)init();last=performance.now();raf=requestAnimationFrame(loop)}
