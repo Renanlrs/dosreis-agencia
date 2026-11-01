@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOS REIS CRM — Seus números na tela. Suas vendas no controle.</title>
+<meta name="description" content="A plataforma da DOS REIS Soluções Digitais que mostra quanto você vendeu hoje, quem está prestes a sumir e quem está pronto pra comprar de novo — em uma tela só.">
+<meta property="og:title" content="DOS REIS CRM — Seus números na tela. Suas vendas no controle.">
+<meta property="og:description" content="Quem não sabe os próprios números não administra: aposta. Conheça a ferramenta que põe vendas, funil, WhatsApp e recompra em uma tela só.">
+<meta property="og:image" content="assets/logo.png">
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#050505;--green:#7CFF39;--accent:#9DFF5A;--red:#FF5F56;--text:#fff;--text-2:rgba(255,255,255,.66);--text-3:rgba(255,255,255,.45);--glass:rgba(255,255,255,.05);--border:rgba(255,255,255,.10)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',ui-sans-serif,system-ui,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .headfont{font-family:'Arial Narrow','Helvetica Neue',Impact,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+
+  /* ---------- fundo ambiente ---------- */
+  .aura{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(130% 90% at 50% 0%,#0a1606 0%,#050805 45%,#020302 100%)}
+  .aura::before{content:"";position:absolute;left:50%;top:32%;width:120vmin;height:120vmin;transform:translate(-50%,-50%);
+    background:radial-gradient(closest-side,rgba(124,255,57,.20),transparent 70%);filter:blur(30px);animation:pulse 8s ease-in-out infinite alternate}
+  @keyframes pulse{from{opacity:.5;transform:translate(-50%,-50%) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+  .grid-fade{position:fixed;inset:0;z-index:0;opacity:.14;
+    background:linear-gradient(rgba(124,255,57,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(124,255,57,.35) 1px,transparent 1px);
+    background-size:44px 44px;mask-image:radial-gradient(60% 55% at 50% 30%,#000,transparent 75%);-webkit-mask-image:radial-gradient(60% 55% at 50% 30%,#000,transparent 75%)}
+
+  /* ---------- nav ---------- */
+  .shell{position:relative;z-index:2}
+  nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px clamp(18px,5vw,52px);backdrop-filter:blur(16px);background:rgba(5,5,5,.72);border-bottom:1px solid transparent;transition:border-color .3s}
+  nav.stuck{border-bottom-color:var(--border)}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+  .brand img{height:40px;width:auto;filter:drop-shadow(0 0 12px rgba(124,255,57,.35))}
+  .n-word{font-weight:800;letter-spacing:.14em;font-size:14px;color:var(--green);text-shadow:0 0 16px rgba(124,255,57,.35);line-height:1}
+  .n-word small{display:block;font-size:8px;letter-spacing:.32em;color:var(--text-2);font-weight:600;margin-top:3px}
+  .n-links{display:flex;gap:26px;font-size:13.5px;color:var(--text-2)}
+  .n-links a{text-decoration:none;transition:.2s}
+  .n-links a:hover{color:var(--green)}
+  .n-cta{display:inline-flex;gap:8px;align-items:center;padding:11px 20px;border-radius:999px;background:var(--green);color:#041000;font-weight:700;font-size:13.5px;text-decoration:none;transition:.25s;box-shadow:0 8px 28px rgba(124,255,57,.28);white-space:nowrap}
+  .n-cta:hover{background:var(--accent);transform:translateY(-2px)}
+  @media(max-width:900px){.n-links{display:none}}
+
+  /* ---------- hero ---------- */
+  main{display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(30px,6vh,64px) 20px 8px}
+  .hero-logo{position:relative;width:min(26vh,190px);height:min(26vh,190px);display:grid;place-items:center;margin-bottom:26px;border-radius:30px;
+    background:radial-gradient(circle at 50% 40%,#0a140a,#040704);border:1px solid rgba(124,255,57,.4);
+    box-shadow:0 0 60px rgba(124,255,57,.22),inset 0 0 50px rgba(0,0,0,.65);padding:16px;opacity:0;animation:pop 1s .15s cubic-bezier(.22,1,.36,1) forwards}
+  .hero-logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 16px rgba(124,255,57,.3));animation:bob 6s ease-in-out infinite alternate}
+  .ring{position:absolute;inset:-14%;border-radius:50%;pointer-events:none}
+  .ring.r1{background:conic-gradient(from 0deg,transparent 0 70%,rgba(124,255,57,.9) 85%,transparent 100%);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 0);mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 0);animation:spin 7s linear infinite}
+  .ring.r2{inset:-26%;background:conic-gradient(from 180deg,transparent 0 60%,rgba(157,255,90,.5) 78%,transparent 92%);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1px),#000 0);mask:radial-gradient(farthest-side,transparent calc(100% - 1px),#000 0);animation:spin 12s linear infinite reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+  @keyframes pop{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:scale(1)}}
+
+  .badge{display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;text-align:center;padding:8px 16px;border-radius:999px;background:var(--glass);backdrop-filter:blur(14px);
+    border:1px solid var(--border);font-size:12.5px;color:var(--text-2);margin-bottom:20px;opacity:0;animation:fu .8s .35s forwards}
+  .badge b{color:var(--green)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(124,255,57,.9);animation:blink 1.8s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.25}}
+  h1{font-size:clamp(34px,6.2vw,76px);line-height:.96;letter-spacing:-.02em;font-weight:800;margin-bottom:18px;max-width:15ch;text-wrap:balance;opacity:0;animation:fu .9s .45s forwards}
+  h1 .g{color:var(--green);text-shadow:0 0 40px rgba(124,255,57,.45)}
+  .sub{max-width:640px;color:var(--text-2);font-weight:300;font-size:clamp(14.5px,1.5vw,17.5px);line-height:1.65;margin-bottom:28px;opacity:0;animation:fu .9s .55s forwards}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fu .9s .65s forwards}
+  .btn{padding:14px 30px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:.25s}
+  .btn.primary{background:var(--green);color:#041000;box-shadow:0 10px 34px rgba(124,255,57,.35)}
+  .btn.primary:hover{background:var(--accent);transform:translateY(-2px) scale(1.03)}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);font-weight:600}
+  .btn.ghost:hover{background:rgba(255,255,255,.07);border-color:#fff}
+  .microtrust{margin-top:14px;font-size:12px;color:var(--text-3);opacity:0;animation:fu .9s .75s forwards}
+
+  /* ---------- painel mockup ---------- */
+  .panel-wrap{width:min(1080px,100%);margin:38px auto 0;padding:0 clamp(0px,2vw,20px);opacity:0;animation:fu 1s .85s forwards}
+  .panel{border-radius:18px;overflow:hidden;border:1px solid var(--border);background:#070b07;box-shadow:0 40px 100px rgba(0,0,0,.65),0 0 60px rgba(124,255,57,.06)}
+  .pbar{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#0f150f;border-bottom:1px solid var(--border)}
+  .pbar i{width:11px;height:11px;border-radius:50%;flex:none}
+  .pbar i:nth-child(1){background:#ff5f56}.pbar i:nth-child(2){background:#ffbd2e}.pbar i:nth-child(3){background:#27c93f}
+  .purl{margin-left:10px;flex:1;background:#050805;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11.5px;color:var(--text-3);text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .pbody{padding:clamp(16px,3vw,26px);text-align:left;background:radial-gradient(120% 90% at 50% 0%,#0d180a,#050805)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .kpi .lab{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+  .kpi .val{font-size:clamp(19px,2.4vw,27px);font-weight:800;letter-spacing:-.02em;line-height:1}
+  .kpi .val.g{color:var(--green)}
+  .kpi .delta{font-size:11.5px;margin-top:7px;color:var(--green);font-weight:600}
+  .kpi .delta.down{color:var(--red)}
+  .prow{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;margin-top:12px}
+  @media(max-width:760px){.prow{grid-template-columns:1fr}}
+  .pcard{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .pcard h5{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between}
+  .pcard h5 em{font-style:normal;color:var(--green);letter-spacing:0;text-transform:none;font-size:11.5px}
+  .bars{display:flex;align-items:flex-end;gap:clamp(4px,1.4vw,10px);height:112px}
+  .bars div{flex:1;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--green),rgba(124,255,57,.14));transform-origin:bottom;animation:grow 1.1s cubic-bezier(.22,1,.36,1) backwards}
+  .bars div.meta{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.05))}
+  @keyframes grow{from{transform:scaleY(.02);opacity:0}to{transform:scaleY(1);opacity:1}}
+  .barlabs{display:flex;gap:clamp(4px,1.4vw,10px);margin-top:8px;font-size:10px;color:var(--text-3)}
+  .barlabs span{flex:1;text-align:center}
+  .funil{display:grid;gap:9px}
+  .fstage{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text-2)}
+  .fstage b{color:#fff;font-weight:700;width:26px;text-align:right;flex:none}
+  .ftrack{flex:1;height:9px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+  .ftrack i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),rgba(124,255,57,.35));animation:slide 1.2s cubic-bezier(.22,1,.36,1) backwards}
+  @keyframes slide{from{width:0!important}}
+  .alerts{display:grid;gap:8px}
+  .alert{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.45;color:var(--text-2);background:rgba(255,95,86,.07);border:1px solid rgba(255,95,86,.25);border-radius:11px;padding:10px 12px}
+  .alert.ok{background:rgba(124,255,57,.07);border-color:rgba(124,255,57,.3)}
+  .alert span{flex:none;font-size:14px;line-height:1.2}
+  .alert b{color:#fff}
+
+  /* ---------- marquee ---------- */
+  .marquee{position:relative;z-index:2;overflow:hidden;padding:28px 0 6px;-webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .track{display:flex;gap:12px;width:max-content;animation:scroll 38s linear infinite}
+  .marquee:hover .track{animation-play-state:paused}
+  .pill{display:inline-flex;gap:9px;align-items:center;padding:9px 16px;border-radius:999px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);font-size:12.5px;color:rgba(255,255,255,.82);white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(124,255,57,.7);flex:none}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* ---------- conteúdo ---------- */
+  .content{position:relative;z-index:2;max-width:1080px;margin:0 auto;padding:10px clamp(20px,5vw,48px) 40px}
+  .sec{padding:64px 0;border-top:1px solid var(--border)}
+  .sec:first-child{border-top:none}
+  .eye{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+  .sec h2{font-size:clamp(26px,3.6vw,42px);line-height:1.06;font-weight:800;letter-spacing:-.015em;margin-bottom:14px;text-wrap:balance}
+  .sec h2 .g{color:var(--green)}
+  .lead{color:var(--text-2);max-width:660px;line-height:1.65;margin-bottom:32px;font-size:15.5px}
+  .center{text-align:center}
+  .center .lead{margin-left:auto;margin-right:auto}
+
+  /* história */
+  .story{display:grid;gap:14px;counter-reset:s}
+  .beat{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:flex-start;background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:22px 24px;transition:.25s}
+  .beat:hover{border-color:rgba(124,255,57,.35);transform:translateY(-3px)}
+  .beat .hr{flex:none;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--green);border:1px solid rgba(124,255,57,.4);border-radius:999px;padding:7px 12px;white-space:nowrap}
+  .beat h3{font-size:18px;font-weight:700;margin-bottom:6px}
+  .beat p{color:var(--text-2);font-size:14.8px;line-height:1.65}
+  .beat p em{font-style:normal;color:#fff;font-weight:600}
+  .turn{margin-top:22px;background:linear-gradient(rgba(124,255,57,.09),rgba(124,255,57,.03));border:1px solid rgba(124,255,57,.35);border-radius:18px;padding:26px 26px}
+  .turn p{font-size:clamp(16px,2vw,20px);line-height:1.5;font-weight:600;text-wrap:balance}
+  .turn p .g{color:var(--green)}
+  .turn small{display:block;margin-top:10px;color:var(--text-2);font-size:13.5px;font-weight:400}
+
+  /* custo de não saber */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .cost{background:var(--glass);border:1px solid rgba(255,95,86,.22);border-radius:18px;padding:22px;transition:.25s}
+  .cost:hover{border-color:rgba(255,95,86,.5);transform:translateY(-4px)}
+  .cost .n{font-size:26px;font-weight:800;color:var(--red);letter-spacing:-.02em;margin-bottom:8px}
+  .cost h4{font-size:16px;font-weight:700;margin-bottom:6px}
+  .cost p{color:var(--text-2);font-size:14px;line-height:1.6}
+
+  /* antes x depois */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.vs{grid-template-columns:1fr}}
+  .col{border-radius:18px;padding:24px;border:1px solid var(--border);background:var(--glass)}
+  .col.after{border-color:rgba(124,255,57,.4);background:linear-gradient(rgba(124,255,57,.07),rgba(124,255,57,.02))}
+  .col h4{font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;color:var(--text-3);font-weight:700}
+  .col.after h4{color:var(--green)}
+  .col li{list-style:none;display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.08);font-size:14.5px;line-height:1.55;color:var(--text-2)}
+  .col li:last-child{border-bottom:none}
+  .col li span{flex:none;font-weight:800;color:var(--red)}
+  .col.after li span{color:var(--green)}
+  .col.after li{color:rgba(255,255,255,.86)}
+
+  /* funcionalidades */
+  .fcard{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:24px;transition:.25s}
+  .fcard:hover{border-color:rgba(124,255,57,.4);transform:translateY(-4px);box-shadow:0 16px 40px rgba(124,255,57,.08)}
+  .fcard .ic{margin-bottom:14px;height:30px;line-height:0}
+  .fcard .ic svg{width:28px;height:28px;stroke:var(--green);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .fcard h3{font-size:17.5px;font-weight:700;margin-bottom:8px}
+  .fcard p{color:var(--text-2);font-size:14.2px;line-height:1.6}
+  .fcard .res{margin-top:12px;font-size:12.8px;color:var(--green);font-weight:600}
+
+  /* passos */
+  .steps{display:grid;gap:14px}
+  .step{display:flex;gap:16px;align-items:flex-start;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:18px 20px}
+  .step .n{flex:none;height:34px;width:34px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#041000;font-weight:800}
+  .step h4{font-size:16px;font-weight:700;margin-bottom:4px}
+  .step p{color:var(--text-2);font-size:14px;line-height:1.55}
+
+  /* provas */
+  .quote{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;transition:.25s}
+  .quote:hover{border-color:rgba(124,255,57,.35);transform:translateY(-4px)}
+  .quote p{font-size:15px;line-height:1.6;color:rgba(255,255,255,.9)}
+  .quote .who{display:flex;align-items:center;gap:11px;margin-top:auto}
+  .quote .av{height:38px;width:38px;border-radius:50%;display:grid;place-items:center;background:rgba(124,255,57,.14);border:1px solid rgba(124,255,57,.35);color:var(--green);font-weight:800;font-size:14px;flex:none}
+  .quote .who b{display:block;font-size:13.5px}
+  .quote .who small{color:var(--text-3);font-size:12px}
+
+  /* stats */
+  .stats{display:flex;justify-content:center;flex-wrap:wrap;gap:clamp(20px,5vw,54px);padding:6px 0 2px}
+  .stat b{font-size:clamp(24px,3vw,32px);color:var(--green);font-weight:800;letter-spacing:-.02em}
+  .stat span{display:block;font-size:11px;color:var(--text-3);letter-spacing:.05em;margin-top:4px}
+
+  /* faq */
+  .qa{border:1px solid var(--border);border-radius:14px;margin-bottom:10px;background:var(--glass);overflow:hidden}
+  .qa summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:600;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary::after{content:"+";color:var(--green);font-size:20px;font-weight:700}
+  .qa[open] summary::after{content:"−"}
+  .qa p{padding:0 18px 16px;color:var(--text-2);font-size:14.2px;line-height:1.65}
+
+  /* banda final */
+  .band{position:relative;z-index:2;max-width:1080px;margin:10px auto 46px;padding:58px clamp(24px,5vw,56px);border-radius:28px;text-align:center;
+    background:linear-gradient(rgba(5,10,5,.72),rgba(5,10,5,.9)),radial-gradient(120% 120% at 50% 0%,rgba(124,255,57,.2),transparent 60%);
+    border:1px solid rgba(124,255,57,.4);overflow:hidden}
+  .band h2{font-size:clamp(26px,4vw,44px);font-weight:800;margin-bottom:12px;letter-spacing:-.015em;text-wrap:balance}
+  .band p{color:var(--text-2);max-width:540px;margin:0 auto 22px;line-height:1.6}
+  .band .btn{padding:15px 32px;font-size:15px}
+  .guarantee{margin-top:16px;font-size:12.5px;color:var(--text-3)}
+  .siteftr{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(--text-3);padding:0 20px 40px;line-height:1.9}
+  .siteftr i{color:var(--green);font-style:normal}
+
+  /* whatsapp flutuante */
+  .float{position:fixed;right:18px;bottom:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;padding:13px 20px;border-radius:999px;
+    background:var(--green);color:#041000;font-weight:700;font-size:13.5px;text-decoration:none;box-shadow:0 12px 34px rgba(124,255,57,.4);transition:.25s}
+  .float:hover{background:var(--accent);transform:translateY(-2px)}
+  @media(max-width:520px){.float{padding:12px 16px;font-size:12.5px}}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+  .rv.in{opacity:1;transform:none}
+  @keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="aura"></div>
+<div class="grid-fade"></div>
+
+<div class="shell">
+  <nav id="nav">
+    <a class="brand" href="#topo">
+      <img src="assets/logo.png" alt="DOS REIS Soluções Digitais">
+      <span class="n-word">DOS REIS<small>SOLUÇÕES DIGITAIS</small></span>
+    </a>
+    <div class="n-links">
+      <a href="#historia">A história</a>
+      <a href="#custo">O custo</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#como">Como funciona</a>
+      <a href="#duvidas">Dúvidas</a>
+    </div>
+    <a class="n-cta" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20ver%20o%20DOS%20REIS%20CRM%20funcionando." target="_blank" rel="noopener">Ver funcionando →</a>
+  </nav>
+
+  <main id="topo">
+    <div class="hero-logo">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <img src="assets/logo.png" alt="Logotipo DOS REIS">
+    </div>
+
+    <div class="badge"><span class="dot"></span> A plataforma que a <b>DOS REIS</b> usa todo dia</div>
+
+    <h1>Você não controla<br>o que você <span class="g">não vê.</span></h1>
+
+    <p class="sub">A maioria dos donos de negócio só descobre que o mês foi ruim quando o mês já acabou.
+      O <b>DOS REIS CRM</b> põe vendas, funil, WhatsApp, metas e recompra na mesma tela —
+      atualizado agora, não no fechamento.</p>
+
+    <div class="cta">
+      <a class="btn primary" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20uma%20demonstra%C3%A7%C3%A3o%20do%20DOS%20REIS%20CRM." target="_blank" rel="noopener">QUERO VER MEUS NÚMEROS →</a>
+      <a class="btn ghost" href="#recursos">Ver o que a ferramenta faz</a>
+    </div>
+    <p class="microtrust">Diagnóstico gratuito · implantação acompanhada · sem fidelidade</p>
+
+    <!-- painel -->
+    <div class="panel-wrap">
+      <div class="panel">
+        <div class="pbar"><i></i><i></i><i></i><div class="purl">🔒 app.dosreis.com.br/painel</div></div>
+        <div class="pbody">
+          <div class="kpis">
+            <div class="kpi"><div class="lab">Vendido hoje</div><div class="val g" data-count="18420" data-prefix="R$ ">R$ 18.420</div><div class="delta">▲ 23% vs. ontem</div></div>
+            <div class="kpi"><div class="lab">Meta do mês</div><div class="val" data-count="87" data-suffix="%">87%</div><div class="delta">faltam R$ 39.100</div></div>
+            <div class="kpi"><div class="lab">Ticket médio</div><div class="val" data-count="1290" data-prefix="R$ ">R$ 1.290</div><div class="delta">▲ 6% no mês</div></div>
+            <div class="kpi"><div class="lab">Clientes sumidos</div><div class="val" data-count="34">34</div><div class="delta down">▼ risco de perda</div></div>
+          </div>
+
+          <div class="prow">
+            <div class="pcard">
+              <h5>Vendas por dia <em>últimos 7 dias</em></h5>
+              <div class="bars">
+                <div style="height:42%;animation-delay:.05s"></div>
+                <div style="height:61%;animation-delay:.12s"></div>
+                <div style="height:38%;animation-delay:.19s"></div>
+                <div style="height:74%;animation-delay:.26s"></div>
+                <div style="height:56%;animation-delay:.33s"></div>
+                <div class="meta" style="height:29%;animation-delay:.4s"></div>
+                <div style="height:92%;animation-delay:.47s"></div>
+              </div>
+              <div class="barlabs"><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span><span>hoje</span></div>
+            </div>
+
+            <div class="pcard">
+              <h5>Funil <em>tempo real</em></h5>
+              <div class="funil">
+                <div class="fstage"><b>128</b><div class="ftrack"><i style="width:100%;animation-delay:.1s"></i></div>Novo lead</div>
+                <div class="fstage"><b>76</b><div class="ftrack"><i style="width:60%;animation-delay:.2s"></i></div>Contato</div>
+                <div class="fstage"><b>41</b><div class="ftrack"><i style="width:33%;animation-delay:.3s"></i></div>Orçamento</div>
+                <div class="fstage"><b>23</b><div class="ftrack"><i style="width:19%;animation-delay:.4s"></i></div>Negociação</div>
+                <div class="fstage"><b>14</b><div class="ftrack"><i style="width:11%;animation-delay:.5s"></i></div>Fechado</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prow" style="grid-template-columns:1fr">
+            <div class="pcard">
+              <h5>O que precisa da sua atenção hoje <em>7 avisos</em></h5>
+              <div class="alerts">
+                <div class="alert"><span>⚠️</span><div><b>9 orçamentos</b> passaram de 5 dias sem retorno — R$ 61.400 parados no funil.</div></div>
+                <div class="alert"><span>⏳</span><div><b>Distribuidora Andrade</b> comprava a cada 28 dias. Estão 47 dias sem pedido.</div></div>
+                <div class="alert ok"><span>✅</span><div>A IA respondeu <b>32 mensagens</b> fora do horário e agendou 4 orçamentos pra hoje.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="marquee">
+    <div class="track" id="track">
+      <span class="pill">Painel de vendas ao vivo</span>
+      <span class="pill">Funil de negócios</span>
+      <span class="pill">WhatsApp integrado</span>
+      <span class="pill">IA que responde 24h</span>
+      <span class="pill">Motor de recompra</span>
+      <span class="pill">Metas por dia</span>
+      <span class="pill">Follow-up automático</span>
+      <span class="pill">Disparo de e-mail</span>
+      <span class="pill">Agenda &amp; Meu Dia</span>
+      <span class="pill">Relatórios por vendedor</span>
+      <span class="pill">Custo de aquisição</span>
+      <span class="pill">Integração com o ERP</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HISTÓRIA -->
+    <section class="sec rv" id="historia">
+      <span class="eye">A história de sempre</span>
+      <h2>São 19h de uma terça.<br>Quanto <span class="g">você vendeu hoje?</span></h2>
+      <p class="lead">Se a resposta demora mais de 5 segundos, o problema não é o mercado, nem a equipe, nem a crise.
+        É que os seus números estão espalhados — e o que está espalhado não é gerido.</p>
+
+      <div class="story">
+        <div class="beat">
+          <div class="hr">19h04</div>
+          <div>
+            <h3>A planilha diz uma coisa. O caderno diz outra.</h3>
+            <p>Um número está no ERP, outro no WhatsApp do vendedor, outro na cabeça de quem atendeu.
+              Você soma tudo no domingo à noite e <em>ainda assim não confia no resultado</em>.</p>
+          </div>
+        </div>
+        <div class="beat">
+          <div class="hr">21h30</div>
+          <div>
+            <h3>Três clientes mandaram mensagem. Ninguém respondeu.</h3>
+            <p>Dois desistem em silêncio. Um pergunta o preço no concorrente.
+              Você nunca vai saber que eles existiram — <em>venda perdida não aparece em relatório nenhum</em>.</p>
+          </div>
+        </div>
+        <div class="beat">
+          <div class="hr">Dia 30</div>
+          <div>
+            <h3>O mês fecha 18% abaixo. E a explicação vem depois.</h3>
+            <p>Você descobre no fim o que dava pra corrigir no dia 8.
+              <em>Não faltou esforço: faltou enxergar a tempo.</em></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="turn">
+        <p>Quem não sabe os próprios números não administra o negócio — <span class="g">aposta nele.</span></p>
+        <small>E aposta é a única despesa que não aparece no balanço.</small>
+      </div>
+    </section>
+
+    <!-- CUSTO -->
+    <section class="sec rv" id="custo">
+      <span class="eye">O preço de não saber</span>
+      <h2>O que a falta de número<br>tira do seu caixa <span class="g">todo mês</span></h2>
+      <p class="lead">Nenhum desses buracos aparece como prejuízo na contabilidade. Todos aparecem no seu extrato.</p>
+      <div class="g4">
+        <div class="cost"><div class="n">7 dias</div><h4>Orçamento esquecido</h4><p>A maior parte das vendas se perde no silêncio depois da proposta — não no preço.</p></div>
+        <div class="cost"><div class="n">1 em 3</div><h4>Cliente que some</h4><p>Comprava todo mês e parou. Ninguém percebeu, porque ninguém estava olhando o ciclo dele.</p></div>
+        <div class="cost"><div class="n">até 23h</div><h4>Mensagem sem resposta</h4><p>Quem pergunta fora do horário compra de quem responde primeiro. Quase nunca é você.</p></div>
+        <div class="cost"><div class="n">Dia 30</div><h4>Meta descoberta tarde</h4><p>Saber que faltou no fim do mês é notícia. Saber que está faltando no dia 8 é decisão.</p></div>
+      </div>
+    </section>
+
+    <!-- ANTES x DEPOIS -->
+    <section class="sec rv">
+      <span class="eye">A virada</span>
+      <h2>A mesma empresa,<br>com os olhos <span class="g">abertos</span></h2>
+      <p class="lead">Não muda o produto nem a equipe. Muda o que você consegue ver — e o que dá pra corrigir enquanto ainda dá tempo.</p>
+      <div class="vs">
+        <div class="col">
+          <h4>Sem controle</h4>
+          <ul>
+            <li><span>✕</span> "Acho que esse mês foi bom."</li>
+            <li><span>✕</span> Follow-up quando alguém lembra</li>
+            <li><span>✕</span> Cliente sumido descoberto por acaso</li>
+            <li><span>✕</span> Vendedor com a carteira no celular dele</li>
+            <li><span>✕</span> Relatório fechado dia 5 do mês seguinte</li>
+            <li><span>✕</span> Anúncio rodando sem saber o retorno</li>
+          </ul>
+        </div>
+        <div class="col after">
+          <h4>Com o DOS REIS CRM</h4>
+          <ul>
+            <li><span>✓</span> "Hoje entraram R$ 18.420. Falta 13% da meta."</li>
+            <li><span>✓</span> A ferramenta avisa quem cobrar hoje</li>
+            <li><span>✓</span> Alerta automático de cliente fora do ciclo</li>
+            <li><span>✓</span> Histórico do cliente na empresa, não no celular</li>
+            <li><span>✓</span> Número fechado agora, a qualquer hora</li>
+            <li><span>✓</span> Custo por cliente e retorno por canal na tela</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECURSOS -->
+    <section class="sec rv" id="recursos">
+      <span class="eye">O que a ferramenta faz</span>
+      <h2>Tudo o que decide venda,<br>em <span class="g">uma tela só</span></h2>
+      <p class="lead">Cada recurso existe para responder uma pergunta que hoje você responde no chute.</p>
+
+      <div class="g3">
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 20h18"/><rect x="5" y="11" width="3" height="6" rx="1"/><rect x="10.5" y="7" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="13" rx="1"/></svg></div>
+          <h3>Painel de vendas ao vivo</h3>
+          <p>Vendido, faturado, ticket médio e comparativo com o mês passado — atualizando sozinho, sem ninguém alimentar planilha.</p>
+          <div class="res">Responde: quanto eu vendi hoje?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></div>
+          <h3>Funil de negócios</h3>
+          <p>Cada oportunidade num cartão, do primeiro contato ao fechamento, com valor, dono e próxima ação definida.</p>
+          <div class="res">Responde: quanto tem parado no funil?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 20.5l1.7-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg></div>
+          <h3>WhatsApp dentro do sistema</h3>
+          <p>Toda conversa ligada ao cliente e ao histórico de compras. Vendedor sai da empresa, a carteira fica.</p>
+          <div class="res">Responde: o que foi combinado mesmo?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+          <h3>Atendimento com IA 24h</h3>
+          <p>Responde na hora, tira dúvida, qualifica e agenda — inclusive às 23h e no domingo. Você entra só quando o cliente está pronto.</p>
+          <div class="res">Responde: por que ninguém respondeu?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></div>
+          <h3>Motor de recompra</h3>
+          <p>A ferramenta aprende o ciclo de cada cliente e avisa quando ele passou do ponto de comprar de novo.</p>
+          <div class="res">Responde: quem está prestes a me largar?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></div>
+          <h3>Metas por dia, não por mês</h3>
+          <p>A meta grande vira alvo diário. No dia 8 você já sabe se está no ritmo — e ainda dá pra reagir.</p>
+          <div class="res">Responde: estou no caminho da meta?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/><path d="M8.5 14.5l2 2 4-4.5"/></svg></div>
+          <h3>Meu Dia &amp; follow-up</h3>
+          <p>Cada manhã a fila do dia já vem montada: quem cobrar, quem retornar, quem visitar. Ninguém começa o dia no vazio.</p>
+          <div class="res">Responde: por onde eu começo hoje?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg></div>
+          <h3>E-mail e campanhas</h3>
+          <p>Reativação de base parada, aviso de pedido e cobrança de retorno saindo em fila controlada, sem cair em spam.</p>
+          <div class="res">Responde: como acordar quem já comprou?</div>
+        </div>
+        <div class="fcard">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V4M16 19v-7M22 19H2"/></svg></div>
+          <h3>Retorno por canal</h3>
+          <p>Quanto entrou de cada origem, quanto custou cada cliente novo e o que realmente pagou o investimento.</p>
+          <div class="res">Responde: meu anúncio dá lucro?</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NÚMEROS -->
+    <section class="sec rv center">
+      <span class="eye">Feito na prática, não no slide</span>
+      <h2>A ferramenta nasceu rodando<br>uma <span class="g">operação de verdade</span></h2>
+      <p class="lead">Antes de virar produto, o DOS REIS CRM foi o sistema que a gente construiu para deixar de perder venda no próprio negócio. O que não funcionou foi jogado fora.</p>
+      <div class="stats">
+        <div class="stat"><b>+30 mil</b><span>CONTATOS GERENCIADOS</span></div>
+        <div class="stat"><b>24/7</b><span>ATENDIMENTO SEM PARAR</span></div>
+        <div class="stat"><b>1 tela</b><span>PRA DECIDIR O DIA</span></div>
+        <div class="stat"><b>7 dias</b><span>PRA ENTRAR NO AR</span></div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="sec rv" id="como">
+      <span class="eye">Como funciona</span>
+      <h2>Do caderno ao painel<br>em <span class="g">três passos</span></h2>
+      <p class="lead">Você não precisa entender de tecnologia. Precisa enxergar o seu negócio.</p>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><h4>Diagnóstico gratuito</h4><p>A gente olha como suas vendas são registradas hoje e mostra, em números, onde está vazando dinheiro.</p></div></div>
+        <div class="step"><div class="n">2</div><div><h4>Implantação em até 7 dias</h4><p>Trazemos sua base de clientes, ligamos o WhatsApp, configuramos metas e funil do jeito que o seu negócio funciona.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h4>Acompanhamento semanal</h4><p>Treinamos a equipe e revisamos os indicadores toda semana. Ferramenta sem rotina vira mais uma aba aberta.</p></div></div>
+      </div>
+    </section>
+
+    <!-- DEPOIMENTOS -->
+    <section class="sec rv">
+      <span class="eye">Quem já enxerga</span>
+      <h2>O que muda quando o dono<br>passa a ver <span class="g">o jogo inteiro</span></h2>
+      <div class="g3">
+        <div class="quote">
+          <p>"Eu descobria o resultado no fim do mês. Hoje abro o painel às 8h e já sei se preciso apertar o time. Mudou a conversa da reunião inteira."</p>
+          <div class="who"><div class="av">C</div><div><b>Carlos</b><small>Distribuidora</small></div></div>
+        </div>
+        <div class="quote">
+          <p>"O alerta de cliente sumido trouxe de volta gente que a gente tinha esquecido. Só isso já pagou a ferramenta no primeiro mês."</p>
+          <div class="who"><div class="av">M</div><div><b>Marina</b><small>Comércio de materiais</small></div></div>
+        </div>
+        <div class="quote">
+          <p>"Antes cada vendedor tinha o cliente no celular dele. Agora o histórico é da empresa — e o follow-up acontece sem eu cobrar."</p>
+          <div class="who"><div class="av">R</div><div><b>Rafael</b><small>Serviços</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="sec rv" id="duvidas">
+      <span class="eye">Dúvidas comuns</span>
+      <h2>O que todo dono <span class="g">pergunta antes</span></h2>
+      <details class="qa"><summary>Meu negócio é pequeno. Serve pra mim?</summary><p>Serve principalmente pra você. Quanto menor a equipe, mais caro sai perder uma venda — e é justamente o pequeno que não tem gente sobrando pra ficar montando relatório.</p></details>
+      <details class="qa"><summary>Vou ter que abandonar meu sistema atual?</summary><p>Não. O CRM conversa com o que você já usa: o sistema continua emitindo, e a ferramenta lê os pedidos e transforma em indicador, meta e alerta.</p></details>
+      <details class="qa"><summary>Minha equipe não é boa de tecnologia.</summary><p>A tela do vendedor tem uma pergunta só: o que fazer agora. A fila do dia já vem pronta. Treinamos a equipe na implantação e acompanhamos nas primeiras semanas.</p></details>
+      <details class="qa"><summary>Em quanto tempo eu vejo diferença?</summary><p>Os números aparecem no primeiro dia. O ganho de venda costuma aparecer quando o follow-up e a recompra entram na rotina — normalmente nas primeiras semanas.</p></details>
+      <details class="qa"><summary>Meus dados ficam seguros?</summary><p>Ficam na nuvem, com acesso por usuário e permissão por perfil. Cada um vê o que precisa ver — e o histórico do cliente deixa de morar no celular de alguém.</p></details>
+    </section>
+  </div>
+
+  <!-- CTA FINAL -->
+  <section class="band rv">
+    <h2>Você pode continuar no escuro<br>ou abrir o painel amanhã.</h2>
+    <p>Fale com a gente e receba um diagnóstico gratuito: a gente mostra, com os seus dados, quanto está escapando hoje.</p>
+    <a class="btn primary" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20o%20diagn%C3%B3stico%20gratuito%20do%20DOS%20REIS%20CRM." target="_blank" rel="noopener">QUERO MEU DIAGNÓSTICO →</a>
+    <p class="guarantee">Sem fidelidade · implantação acompanhada · seus dados são seus</p>
+  </section>
+
+  <footer class="siteftr">
+    © 2026 DOS REIS SOLUÇÕES DIGITAIS · <i>Marketing • Tecnologia • Inteligência Artificial</i><br>
+    Quem sabe seus números decide. Quem não sabe, torce.
+  </footer>
+</div>
+
+<a class="float" href="https://wa.me/5519988013439?text=Ol%C3%A1!%20Quero%20conhecer%20o%20DOS%20REIS%20CRM." target="_blank" rel="noopener">💬 Falar agora</a>
+
+<script>
+  // nav com borda ao rolar
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('stuck', scrollY > 12), {passive:true});
+
+  // marquee sem emenda
+  const track = document.getElementById('track');
+  track.innerHTML += track.innerHTML;
+
+  // reveal + contadores
+  const fmt = new Intl.NumberFormat('pt-BR');
+  function countUp(el){
+    const alvo = +el.dataset.count, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+    const dur = 1400, t0 = performance.now();
+    (function tick(t){
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = pre + fmt.format(Math.round(alvo * e)) + suf;
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+  const io = new IntersectionObserver((ents) => {
+    ents.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if (e.target.dataset.count) countUp(e.target);
+      io.unobserve(e.target);
+    });
+  }, {threshold:.18, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv,[data-count]').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
