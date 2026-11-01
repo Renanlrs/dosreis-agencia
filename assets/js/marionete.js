@@ -1,7 +1,9 @@
 /* ===== MARIONETE DOS REIS =====
-   O mascote real (recorte da arte oficial) é uma malha em WebGL; 5 fios dourados saem das
-   pontas dos dedos e deformam braços, joelhos e cabeça. A mão vem da CÂMERA (MediaPipe Hands,
-   processado no próprio aparelho) ou, sem câmera, do cursor / dedo na tela. */
+   O mascote real (recorte da arte oficial) vira um BONECO ARTICULADO: a malha WebGL tem um
+   esqueleto 2D (tronco, cabeça, capa, ombro/cotovelo, quadril/joelho) com skinning por peso.
+   Braços e pernas dobram por cinemática inversa nas juntas — nada de esticar a imagem — e mãos,
+   pés e capa vão em molas, com inércia. 5 fios dourados saem das pontas dos dedos: a mão vem da
+   CÂMERA (MediaPipe Hands, processado no próprio aparelho) ou, sem câmera, do cursor / toque. */
 (function(){
   const st=document.getElementById('pup'); if(!st) return;
   const cv=st.querySelector('.pup-cv'), cx=cv.getContext('2d'), gc=st.querySelector('.pup-gl');
@@ -10,28 +12,55 @@
   const log=st.querySelector('.pup-log'), wait=st.querySelector('.pup-term-wait'), track=st.querySelector('.pup-track');
   const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
   let W=0,H=0,dpr=1,mob=false,raf=0,last=performance.now(),S=1;
+  const lerp=(a,b,k)=>a+(b-a)*k, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const sstep=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t)};
 
-  /* ---------- imagem do mascote (587x926) e pontos de controle em px da imagem ---------- */
-  const IW=587, IH=926, NECK={x:330,y:300};
-  const CT={lh:{x:112,y:332,s:108,m:115}, rh:{x:522,y:410,s:98,m:105}, lk:{x:288,y:690,s:112,m:85}, rk:{x:440,y:702,s:112,m:85},
-            lf:{x:236,y:872,s:96,m:115}, rf:{x:462,y:868,s:96,m:115}, cape:{x:70,y:700,s:170}};
+  /* ---------- imagem do mascote (587x926) e esqueleto em px da imagem ---------- */
+  const IW=587, IH=926, NECK={x:335,y:312};
+  const J={P:{x:345,y:545}, N:{x:335,y:312}, C:{x:240,y:420},
+           SL:{x:245,y:345}, EL:{x:190,y:368}, WL:{x:140,y:345},      // braço esquerdo (mão aberta)
+           SR:{x:425,y:375}, ER:{x:462,y:478}, WR:{x:505,y:445},      // braço direito (joinha)
+           HL:{x:300,y:585}, KL:{x:276,y:700}, AL:{x:255,y:815},      // perna esquerda
+           HR:{x:400,y:590}, KR:{x:430,y:706}, AR:{x:432,y:820}};     // perna direita
   const CROWN={x:345,y:24}, EYES=[{x:296,y:196},{x:404,y:206}], LOGO={x:396,y:410};
+  const ATT=[{x:96,y:330},{x:278,y:700},CROWN,{x:430,y:706},{x:522,y:400}];   // onde cada fio amarra
   const img=new Image(); img.src='assets/img/mascote-recorte.webp';
 
-  let K=1; const R={x:0,y:0,tilt:0,aH:0,capeV:0,spin:0,spinV:0};
-  /* poses do vídeo de referência: OCIOSA (em pé) · EXEC (agacha, 3/4, anda) · VOO (sobe, inclina, gira) ·
-     PESADO (base larga, braços pra cima, sobe e desce) · SOLTO (mão saiu: fios caem no canto) */
-  const POSE={idle:{q:0,yaw:0,lift:0,lean:0,arms:0,walk:0,bob:0,e:.1},
-              exec:{q:.75,yaw:.62,lift:0,lean:.06,arms:.25,walk:1,bob:0,e:.5},
-              voo:{q:.15,yaw:0,lift:.09,lean:-.42,arms:.55,walk:0,bob:0,e:.75},
-              pesado:{q:.5,yaw:0,lift:0,lean:0,arms:1,walk:0,bob:1,e:.95},
-              solto:{q:0,yaw:0,lift:0,lean:0,arms:0,walk:0,bob:0,e:.05}};
-  const PZ={q:0,yaw:0,lift:0,lean:0,arms:0,walk:0,bob:0}; let mode='idle',modeAt=0,demoI=0,demoAt=0;
-  const DEMO=[['idle',2.6],['exec',3.4],['voo',3.2],['pesado',3.4],['solto',2.4]];
+  // ossos para o skinning: segmento + raio de influência. 0 tronco · 1 cabeça · 2 capa · 3/4 braço E · 5/6 braço D · 7/8 perna E · 9/10 perna D
+  const BW=[[J.P,J.N,78],[J.N,{x:335,y:120},1],[J.C,{x:60,y:780},58],
+            [J.SL,J.EL,30],[J.EL,{x:55,y:322},42],[J.SR,J.ER,30],[J.ER,{x:522,y:385},38],
+            [J.HL,J.KL,40],[J.KL,{x:220,y:872},46],[J.HR,J.KR,40],[J.KR,{x:470,y:872},46]];
+  const NB=BW.length;
+  function segD(px,py,a,b){const vx=b.x-a.x,vy=b.y-a.y,t=clamp(((px-a.x)*vx+(py-a.y)*vy)/(vx*vx+vy*vy),0,1);return Math.hypot(px-a.x-vx*t,py-a.y-vy*t)}
+  function weights(x,y){                       // até 4 ossos por vértice
+    const w=new Float32Array(NB);
+    for(let i=0;i<NB;i++){if(i===1)continue;const d=Math.max(segD(x,y,BW[i][0],BW[i][1]),1)/BW[i][2];w[i]=1/(d*d*d*d+1e-6)}
+    let s=0;for(let i=0;i<NB;i++)s+=w[i];for(let i=0;i<NB;i++)w[i]/=s;
+    const h=(x>165&&x<515)?sstep(322,288,y):0;  // cabeça: tudo acima do pescoço
+    if(h>0){for(let i=0;i<NB;i++)w[i]*=1-h;w[1]+=h}
+    const top=[...w.keys()].sort((a,b)=>w[b]-w[a]).slice(0,4);let ts=0;top.forEach(i=>ts+=w[i]);
+    return top.map(i=>[i,w[i]/ts]);
+  }
+  const ATTW=ATT.map(p=>weights(p.x,p.y)), EYEW=EYES.map(p=>weights(p.x,p.y)), LOGOW=weights(LOGO.x,LOGO.y);
+
+  /* ---------- poses do vídeo de referência ----------
+     OCIOSA (em pé, respirando) · EXEC (agacha, 3/4, anda) · VOO (sobe, inclina, pernas pra trás) ·
+     PESADO (base larga, braços pra cima, sobe e desce) · SOLTO (mão saiu: fios caem, boneco amolece) */
+  let K=1; const R={x:0,y:0,tilt:0,capeV:0,spin:0,spinV:0};
+  const POSE={idle:{q:0,yaw:0,lift:0,lean:0,raise:0,walk:0,fly:0,limp:0,e:.1},
+              exec:{q:.38,yaw:.58,lift:0,lean:.05,raise:0,walk:1,fly:0,limp:0,e:.5},
+              voo:{q:0,yaw:0,lift:.09,lean:-.38,raise:0,walk:0,fly:1,limp:0,e:.75},
+              pesado:{q:.42,yaw:0,lift:0,lean:0,raise:1,walk:0,fly:0,limp:0,e:.95},
+              solto:{q:.08,yaw:0,lift:0,lean:0,raise:0,walk:0,fly:0,limp:1,e:.05}};
+  const PZ={q:0,yaw:0,lift:0,lean:0,raise:0,walk:0,fly:0,limp:0}; let mode='idle',modeAt=0,demoI=0,demoAt=0;
+  const DEMO=[['idle',3],['exec',3.6],['voo',3.2],['pesado',3.6],['solto',2.6]];
   const FANS={idle:[[-62,8],[-34,-30],[-4,-44],[27,-34],[52,-6]],exec:[[-78,18],[-60,30],[-42,36],[-24,34],[6,14]],
               voo:[[-12,8],[-6,-62],[4,6],[12,8],[20,10]],pesado:[[-12,8],[-6,-62],[4,6],[12,8],[20,10]]};
   const fanC=FANS.idle.map(a=>a.slice());
-  const D={lh:{x:0,y:0},rh:{x:0,y:0},lk:{x:0,y:0},rk:{x:0,y:0},lf:{x:0,y:0},rf:{x:0,y:0},head:{x:0,y:0}};
+  // estado do boneco (px da imagem): raiz, ângulos e molas de mãos/pés
+  const B={root:{x:0,y:0},rt:0,rh:0,rc:0,rcV:0, wl:{x:J.WL.x,y:J.WL.y,vx:0,vy:0}, wr:{x:J.WR.x,y:J.WR.y,vx:0,vy:0},
+           al:{x:J.AL.x,y:J.AL.y,vx:0,vy:0}, ar:{x:J.AR.x,y:J.AR.y,vx:0,vy:0}, ph:0};
+  const M=new Float32Array(NB*4);               // por osso: cos, sin, tx, ty
   let gl=null;
 
   function size(){
@@ -44,27 +73,41 @@
   const base=()=>mob?{x:W*.46,y:H*.11+NECK.y*K}:{x:W*.27,y:H*.09+NECK.y*K};
   const restHand=()=>camOn?(mob?{x:W*.5,y:H*.3}:{x:W*.55,y:H*.4}):(mob?{x:W*.76,y:H*.16}:{x:W*.5,y:H*.26});
 
-  /* ---------- deformação: ponto da imagem -> tela ---------- */
-  const sstep=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t)};
-  function warp(x,y){
-    let dx=0,dy=0; const hw=sstep(318,250,y);                 // 1 = cabeça
-    if(hw>0){const a=R.aH*hw,ax=x-NECK.x,ay=y-NECK.y,c=Math.cos(a),s=Math.sin(a);
-      dx+=ax*c-ay*s-ax+D.head.x*hw; dy+=ax*s+ay*c-ay+D.head.y*hw}
-    const body=1-hw;
-    for(const k of ['lh','rh','lk','rk','lf','rf']){const c=CT[k],ex=x-c.x,ey=y-c.y,w=Math.exp(-(ex*ex+ey*ey)/(2*c.s*c.s))*body;
-      dx+=w*D[k].x; dy+=w*D[k].y}
-    const cp=CT.cape,ex=x-cp.x,ey=y-cp.y; dx+=Math.exp(-(ex*ex+ey*ey)/(2*cp.s*cp.s))*sstep(430,620,y)*R.capeV;
-    if(PZ.q>0){const q=PZ.q, ky=Math.exp(-((y-690)*(y-690))/(2*110*110));
-      dy+=q*150*(1-sstep(640,880,y));                                  // tronco desce, pés ficam no chão
-      dx+=q*78*Math.tanh((x-375)/60)*ky}                               // joelhos abrem
-    const ang=R.spin+PZ.yaw, cs=Math.cos(ang), sn=Math.sin(ang), sx=(cs<0?-1:1)*Math.max(Math.abs(cs),.05);
-    const ux=x+dx-NECK.x, z=ux*sn, pr=1400/(1400+z);                   // perspectiva: lado de lá encolhe
-    const px=ux*sx*pr, py=(y+dy-NECK.y)*pr, c=Math.cos(R.tilt), s=Math.sin(R.tilt);
+  /* ---------- esqueleto: matrizes por osso ---------- */
+  function setM(i,j,w,r){const c=Math.cos(r),s=Math.sin(r),o=i*4;M[o]=c;M[o+1]=s;M[o+2]=w.x-(c*j.x-s*j.y);M[o+3]=w.y-(s*j.x+c*j.y)}
+  function ap(i,x,y){const o=i*4;return{x:M[o]*x-M[o+1]*y+M[o+2],y:M[o+1]*x+M[o]*y+M[o+3]}}
+  const ang=(a,b)=>Math.atan2(b.y-a.y,b.x-a.x);
+  function mkChain(a,b,c){const l1=Math.hypot(b.x-a.x,b.y-a.y),l2=Math.hypot(c.x-b.x,c.y-b.y);
+    let d=ang(b,a)*0, s=ang(a,b)-ang(a,c); s=Math.atan2(Math.sin(s),Math.cos(s));
+    return {a,b,c,l1,l2,sg:s>=0?1:-1,r1:ang(a,b),r2:ang(b,c)}}
+  const CH={L:mkChain(J.SL,J.EL,J.WL),R:mkChain(J.SR,J.ER,J.WR),LL:mkChain(J.HL,J.KL,J.AL),LR:mkChain(J.HR,J.KR,J.AR)};
+  function ik(ch,base,tg,iu,il){                 // 2 ossos: cotovelo/joelho dobra pro mesmo lado da arte
+    const dx=tg.x-base.x,dy=tg.y-base.y,th=Math.atan2(dy,dx);
+    const d=clamp(Math.hypot(dx,dy),Math.abs(ch.l1-ch.l2)+1,ch.l1+ch.l2-.5);
+    const A=Math.acos(clamp((ch.l1*ch.l1+d*d-ch.l2*ch.l2)/(2*ch.l1*d),-1,1)), a1=th+ch.sg*A;
+    const e={x:base.x+Math.cos(a1)*ch.l1,y:base.y+Math.sin(a1)*ch.l1}, w={x:base.x+Math.cos(th)*d,y:base.y+Math.sin(th)*d};
+    setM(iu,ch.a,base,a1-ch.r1); setM(il,ch.b,e,ang(e,w)-ch.r2);
+  }
+  function pose(){
+    const P2={x:J.P.x+B.root.x,y:J.P.y+B.root.y};
+    setM(0,J.P,P2,B.rt);
+    setM(1,J.N,ap(0,J.N.x,J.N.y),B.rt+B.rh);
+    setM(2,J.C,ap(0,J.C.x,J.C.y),B.rt+B.rc);
+    ik(CH.L,ap(0,J.SL.x,J.SL.y),ap(0,B.wl.x,B.wl.y),3,4);
+    ik(CH.R,ap(0,J.SR.x,J.SR.y),ap(0,B.wr.x,B.wr.y),5,6);
+    ik(CH.LL,ap(0,J.HL.x,J.HL.y),B.al,7,8);       // pés ficam no chão (alvo fora do tronco)
+    ik(CH.LR,ap(0,J.HR.x,J.HR.y),B.ar,9,10);
+  }
+  function skin(x,y,wt){let X=0,Y=0;for(const [i,w] of wt){const o=i*4;X+=w*(M[o]*x-M[o+1]*y+M[o+2]);Y+=w*(M[o+1]*x+M[o]*y+M[o+3])}return{x:X,y:Y}}
+  function place(p){                             // imagem -> tela (giro 3D falso, inclinação, escala)
+    const an=R.spin+PZ.yaw, cs=Math.cos(an), sn=Math.sin(an), sx=(cs<0?-1:1)*Math.max(Math.abs(cs),.05);
+    const ux=p.x-NECK.x, z=ux*sn, pr=1400/(1400+z), px=ux*sx*pr, py=(p.y-NECK.y)*pr, c=Math.cos(R.tilt), s=Math.sin(R.tilt);
     return {x:R.x+(px*c-py*s)*K, y:R.y+(px*s+py*c)*K};
   }
+  const warpW=(p,wt)=>place(skin(p.x,p.y,wt));
 
-  /* ---------- WebGL: malha texturizada ---------- */
-  const NX=22, NY=34; let prog,posBuf,pos,nIdx=0,texOK=false,resLoc,shLoc;
+  /* ---------- WebGL: malha texturizada com skinning ---------- */
+  const NX=40, NY=64; let prog,posBuf,pos,nIdx=0,texOK=false,resLoc,shLoc,VW=null,VR=null;
   (function initGL(){
     gl=gc.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:true}); if(!gl)return;
     const sh=(t,src)=>{const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s};
@@ -72,7 +115,8 @@
     gl.attachShader(prog,sh(gl.VERTEX_SHADER,'attribute vec2 p;attribute vec2 uv;uniform vec2 res;varying vec2 v;void main(){vec2 c=p/res*2.0-1.0;gl_Position=vec4(c.x,-c.y,0.0,1.0);v=uv;}'));
     gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec2 v;uniform sampler2D t;uniform float sh;void main(){vec4 c=texture2D(t,v);gl_FragColor=vec4(c.rgb*sh+vec3(.03,.16,.01)*c.a*(1.0-sh),c.a);}'));
     gl.linkProgram(prog);gl.useProgram(prog);
-    const uv=new Float32Array((NX+1)*(NY+1)*2); for(let j=0;j<=NY;j++)for(let i=0;i<=NX;i++){const o=(j*(NX+1)+i)*2;uv[o]=i/NX;uv[o+1]=j/NY}
+    const nv=(NX+1)*(NY+1), uv=new Float32Array(nv*2); VW=[];VR=new Float32Array(nv*2);
+    for(let j=0;j<=NY;j++)for(let i=0;i<=NX;i++){const k=j*(NX+1)+i,x=i/NX*IW,y=j/NY*IH;uv[k*2]=i/NX;uv[k*2+1]=j/NY;VR[k*2]=x;VR[k*2+1]=y;VW.push(weights(x,y))}
     const ub=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,ub);gl.bufferData(gl.ARRAY_BUFFER,uv,gl.STATIC_DRAW);
     const ul=gl.getAttribLocation(prog,'uv');gl.enableVertexAttribArray(ul);gl.vertexAttribPointer(ul,2,gl.FLOAT,false,0,0);
     pos=new Float32Array(uv.length); posBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,posBuf);gl.bufferData(gl.ARRAY_BUFFER,pos,gl.DYNAMIC_DRAW);
@@ -91,18 +135,17 @@
   const front=()=>{const c=Math.cos(R.spin);return .26+.74*sstep(-.15,.2,c)};
   function drawMascot(){
     if(gl){ if(!texOK)return;
-      for(let j=0;j<=NY;j++)for(let i=0;i<=NX;i++){const p=warp(i/NX*IW,j/NY*IH),o=(j*(NX+1)+i)*2;pos[o]=p.x;pos[o+1]=p.y}
+      for(let k=0;k<VW.length;k++){const p=place(skin(VR[k*2],VR[k*2+1],VW[k]));pos[k*2]=p.x;pos[k*2+1]=p.y}
       gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(resLoc,W,H);gl.uniform1f(shLoc,front());
       gl.bindBuffer(gl.ARRAY_BUFFER,posBuf);gl.bufferSubData(gl.ARRAY_BUFFER,0,pos);gl.drawElements(gl.TRIANGLES,nIdx,gl.UNSIGNED_SHORT,0);
     } else if(img.complete){ // sem WebGL: imagem inteira balançando
-      const o=warp(0,0),cs=Math.cos(R.spin);cx.save();cx.translate(o.x,o.y);cx.rotate(R.tilt);cx.scale((cs<0?-1:1)*Math.max(Math.abs(cs),.05),1);cx.drawImage(img,0,0,IW*K,IH*K);cx.restore();
+      const o=place({x:0,y:B.root.y}),cs=Math.cos(R.spin);cx.save();cx.translate(o.x,o.y);cx.rotate(R.tilt+B.rt);cx.scale((cs<0?-1:1)*Math.max(Math.abs(cs),.05),1);cx.drawImage(img,0,0,IW*K,IH*K);cx.restore();
     }
   }
 
   /* ---------- mão: cursor/toque ou câmera ---------- */
   const hand={x:0,y:0,tx:0,ty:0}; let ptrAt=-1e9,E=0,camOn=false,camHandAt=-1e9;
-  const FAN=[[-62,8],[-34,-30],[-4,-44],[27,-34],[52,-6]];
-  const fing=FAN.map(()=>({x:0,y:0,vx:0,vy:0,tx:0,ty:0}));
+  const fing=[0,1,2,3,4].map(()=>({x:0,y:0,vx:0,vy:0,tx:0,ty:0}));
   let ptrDown=false; const gHist=[]; let gPt=null, pointFr=0;
   st.addEventListener('pointerup',()=>{ptrDown=false},{passive:true}); addEventListener('pointerup',()=>{ptrDown=false});
   function setPtr(e){if(camOn&&performance.now()-camHandAt<1200)return;const r=st.getBoundingClientRect();hand.tx=e.clientX-r.left;hand.ty=e.clientY-r.top;ptrAt=performance.now();st.classList.add('on')}
@@ -112,14 +155,14 @@
 
   let inited=false;
   function init(){const b=base(),h=restHand();hand.x=hand.tx=h.x;hand.y=hand.ty=h.y;R.x=b.x;R.y=b.y;
-    fing.forEach((f,i)=>{f.x=h.x+FAN[i][0]*S;f.y=h.y+FAN[i][1]*S;f.vx=f.vy=0});inited=true}
+    fing.forEach((f,i)=>{f.x=h.x+FANS.idle[i][0]*S;f.y=h.y+FANS.idle[i][1]*S;f.vx=f.vy=0});pose();inited=true}
 
   const STM={idle:'OCIOSA',exec:'EXECUTANDO TAREFA',voo:'SUBINDO NOVO SISTEMA',pesado:'TRABALHO PESADO',solto:'OCIOSA'};
   const WTM={idle:'aguardando comando',exec:'executando',voo:'gerando',pesado:'processando o lote',solto:'aguardando comando'};
   const LOGM={idle:['i','mão aberta · agente em espera'],exec:['r','mão deitada · executando implementação'],voo:['i','1 dedo · subindo novo sistema'],
               pesado:['r','levantando: lote pesado (1,3 mil notas)'],solto:['d','mão solta · agente volta pra base']};
   const pulses=[];
-  const lerp=(a,b,k)=>a+(b-a)*k, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function spring(o,tx,ty,dt,k,c){o.vx+=((tx-o.x)*k-o.vx*c)*dt;o.vy+=((ty-o.y)*k-o.vy*c)*dt;o.x+=o.vx*dt;o.y+=o.vy*dt}
 
   function step(t,dt){
     const tt=t/1000, h0=restHand(), cam=camOn&&t-camHandAt<700, idle=!cam&&t-ptrAt>2200;
@@ -135,11 +178,11 @@
     else { demoAt=t;demoI=0; const v=Math.hypot(hand.tx-hand.x,hand.ty-hand.y)/S;
       want=ptrDown?'pesado':v>60?'voo':v>14?'exec':(mode==='voo'||mode==='exec')&&t-modeAt<900?mode:'idle' }
     if(want!==mode){mode=want;modeAt=t;nextLog=0;forceLine=LOGM[mode]}
-    const tp=POSE[mode], kp=1-Math.pow(.015,dt);
+    const tp=POSE[mode], kp=1-Math.pow(.02,dt);
     for(const key in PZ)PZ[key]=lerp(PZ[key],tp[key],kp);
-    if(mode==='pesado')PZ.q=lerp(PZ.q,.42+.3*Math.sin(tt*5.2),kp);   // agacha e levanta (levantando peso)
-    if(mode==='voo')PZ.yaw=lerp(PZ.yaw,Math.sin(tt*1.9)*.9,kp);        // gira no ar
+    if(mode==='voo')PZ.yaw=lerp(PZ.yaw,Math.sin(tt*1.9)*.85,kp);        // gira no ar
     const fz=FANS[mode]||FANS.idle; fanC.forEach((f,i)=>{f[0]=lerp(f[0],fz[i][0],kp*1.5);f[1]=lerp(f[1],fz[i][1],kp*1.5)});
+
     const k=1-Math.pow(.001,dt*(idle?1.4:cam?9:6));
     const px=hand.x,py=hand.y; hand.x=lerp(hand.x,hand.tx,k);hand.y=lerp(hand.y,hand.ty,k);
     const sp=Math.hypot(hand.x-px,hand.y-py)/Math.max(dt,.001)/S;
@@ -153,32 +196,64 @@
     });
     const work=clamp(sp/900+flex/Math.max(dt,.001)/S/2500,0,1);
     E=lerp(E,Math.max(work*.5,POSE[mode].e),1-Math.pow(.02,dt));
-    // corpo pendurado: segue a mão, balança e inclina
-    const b=base(), dx=hand.x-h0.x, dy=hand.y-h0.y, kb=1-Math.pow(.02,dt);
-    const kf2=1-Math.pow(cam?.004:.02,dt);
-    const fol=mode==='voo'?.5:mode==='solto'?0:.18;
+
+    // ----- corpo inteiro: fica na base, segue um pouco a mão (no voo, bem mais) -----
+    const b=base(), dx=hand.x-h0.x, dy=hand.y-h0.y, kb=1-Math.pow(.02,dt), kf2=1-Math.pow(cam?.004:.02,dt);
+    const fol=mode==='voo'?.5:mode==='solto'?0:.16, oX=R.x, oY=R.y;
     R.x=lerp(R.x,b.x+clamp(dx*fol,-W*(mob?.12:.1),W*(mob?.12:.22))-PZ.lift*W*.12,kf2);
-    R.y=lerp(R.y,b.y+clamp(dy*fol,-H*(mob?.05:.1),H*(mob?.08:.11))-PZ.lift*H+Math.sin(tt*(mode==='voo'?3:1.6))*(mode==='voo'?12:3)*S,kf2);
-    R.tilt=lerp(R.tilt,PZ.lean+(mode==='idle'||mode==='solto'?0:clamp((fing[4].y-fing[0].y)*.0015/S+(hand.x-px)/Math.max(dt,.001)*.00015/S,-.2,.2)),kb);
-    // cada dedo puxa uma parte: deslocamento do dedo em relação à mão ABERTA (calibrada sozinha)
+    R.y=lerp(R.y,b.y+clamp(dy*fol,-H*(mob?.05:.1),H*(mob?.08:.11))-PZ.lift*H+Math.sin(tt*3)*12*S*PZ.fly,kf2);
+    R.tilt=lerp(R.tilt,PZ.lean+(mode==='idle'||mode==='solto'?0:clamp((hand.x-px)/Math.max(dt,.001)*.00012/S,-.15,.15)),kb);
+    const mvX=(R.x-oX)/K, mvY=(R.y-oY)/K;           // quanto o corpo andou (px da imagem): mãos/pés/capa atrasam
+
+    // ----- fios: deslocamento de cada dedo em relação à mão aberta (calibrada sozinha) -----
     fing.forEach((f,i)=>{const ox=f.x-hand.x,oy=f.y-hand.y;
-      if(!cam){f.rx=FAN[i][0]*S;f.ry=FAN[i][1]*S;return}
+      if(!cam){f.rx=fanC[i][0]*S;f.ry=fanC[i][1]*S;return}
       if(f.rx===undefined||f.calib){f.rx=ox;f.ry=oy;f.calib=false;return}
       const open=Math.hypot(ox,oy)>Math.hypot(f.rx,f.ry), a=1-Math.pow(open?.2:.97,dt); f.rx=lerp(f.rx,ox,a); f.ry=lerp(f.ry,oy,a)});
-    const g=(cam?2.4:1.9)*(mode==='idle'?1:.45), rel=i=>({x:(fing[i].x-hand.x-fing[i].rx)*g+dx*.12,y:(fing[i].y-hand.y-fing[i].ry)*g+dy*.12});
-    const kj=1-Math.pow(.004,dt), put=(key,v,g)=>{const m=CT[key].m;D[key].x=lerp(D[key].x,clamp(v.x/K*g,-m,m),kj);D[key].y=lerp(D[key].y,clamp(v.y/K*g,-m,m),kj)};
-    const A=PZ.arms, wk=Math.sin(tt*7)*PZ.walk;
-    const add=(v,ax,ay)=>({x:v.x+ax*K,y:v.y+ay*K});
-    put('lh',add(rel(0),18*A,-120*A),1); put('rh',add(rel(4),-18*A,-112*A),1);
-    put('lk',add(rel(1),0,-Math.max(0,wk)*70),.6); put('rk',add(rel(3),0,-Math.max(0,-wk)*70),.6);
-    const hv=rel(2); D.head.x=lerp(D.head.x,clamp(hv.x/K*.25,-16,16),kj); D.head.y=lerp(D.head.y,clamp(hv.y/K*.25,-14,10),kj);
-    R.aH=lerp(R.aH,clamp(hv.x/K*.004,-.3,.3),kj);
-    // pés balançam atrasados (pendurados)
-    const kf=1-Math.pow(.03,dt);
-    const dang=mode==='voo'?50:0;                                   // no voo as pernas ficam pra trás
-    D.lf.x=lerp(D.lf.x,D.lk.x*1.2-R.tilt*60+dang,kf);D.lf.y=lerp(D.lf.y,D.lk.y*.9-dang*.5,kf);
-    D.rf.x=lerp(D.rf.x,D.rk.x*1.2-R.tilt*60+dang,kf);D.rf.y=lerp(D.rf.y,D.rk.y*.9-dang*.5,kf);
-    R.capeV=lerp(R.capeV,clamp(-(hand.x-px)/Math.max(dt,.001)/K*.03,-40,40)+Math.sin(tt*1.4)*8,1-Math.pow(.05,dt));
+    const g=mode==='solto'?0:(cam?2.2:1.4)*(mode==='idle'?1:.5);
+    const rel=i=>({x:clamp((fing[i].x-hand.x-fing[i].rx)/K*g,-110,110),y:clamp((fing[i].y-hand.y-fing[i].ry)/K*g,-110,110)});
+    const r0=rel(0),r1=rel(1),r2=rel(2),r3=rel(3),r4=rel(4);
+
+    // ----- esqueleto: raiz, tronco, cabeça, capa -----
+    const breath=Math.sin(tt*1.7), Wk=PZ.walk; B.ph+=dt*7.2*Wk;
+    const ph=B.ph, step1=Math.sin(ph);
+    let q=PZ.q; if(mode==='pesado')q+=.2*Math.sin(tt*4.6)*PZ.raise;   // sobe e desce com o peso
+    const kr=1-Math.pow(.0008,dt);
+    B.root.x=lerp(B.root.x,step1*6*Wk,kr);
+    B.root.y=lerp(B.root.y,q*100+breath*2.5-Math.abs(Math.cos(ph))*9*Wk+PZ.limp*10,kr);
+    B.rt=lerp(B.rt,Math.sin(tt*1.1)*.03+step1*.05*Wk-r2.x*.0016+PZ.limp*.06-PZ.fly*.05,kr);
+    const look=clamp((hand.x-R.x)/Math.max(W,1)*.5,-.18,.18)*(mode==='solto'?0:1);
+    B.rh=lerp(B.rh,clamp(look+Math.sin(tt*.8)*.07+r2.x*.0035-step1*.04*Wk+PZ.limp*.22,-.42,.42),1-Math.pow(.003,dt));
+    const capeT=clamp(mvX*.03,-.35,.35)+Math.sin(tt*1.4)*.035+step1*.06*Wk+PZ.fly*.32;
+    B.rcV+=((capeT-B.rc)*60-B.rcV*7)*dt; B.rc+=B.rcV*dt;
+
+    // ----- mãos (alvo de IK em px da imagem, no referencial do tronco) -----
+    let wl={x:J.WL.x+Math.sin(tt*1.15)*10,y:J.WL.y+Math.cos(tt*1.5)*9},
+        wr={x:J.WR.x+Math.sin(tt*1.3+1)*6,y:J.WR.y+Math.sin(tt*1.6)*9};
+    const mix=(p,x,y,a)=>{p.x=lerp(p.x,x,a);p.y=lerp(p.y,y,a)};
+    mix(wl,168,262,PZ.raise); mix(wr,486,282,PZ.raise);                      // braços pra cima (peso)
+    if(mode==='pesado'){wl.y+=Math.sin(tt*4.6)*14;wr.y+=Math.sin(tt*4.6)*14}
+    mix(wl,128,262,PZ.fly); mix(wr,540,318,PZ.fly);                          // voo: braços à frente
+    mix(wl,222,452,PZ.limp); mix(wr,446,540,PZ.limp);                        // solto: braços caídos
+    wl.x+=-step1*26*Wk; wl.y+=Math.abs(step1)*-6*Wk; wr.x+=step1*22*Wk;     // balanço ao andar
+    wl.x+=r0.x; wl.y+=r0.y; wr.x+=r4.x; wr.y+=r4.y;                          // fios puxam as mãos
+    B.wl.x-=mvX*.5;B.wl.y-=mvY*.5;B.wr.x-=mvX*.5;B.wr.y-=mvY*.5;              // inércia
+    const ks=mode==='solto'?55:150, kc=mode==='solto'?6:16;
+    spring(B.wl,wl.x,wl.y,dt,ks,kc); spring(B.wr,wr.x,wr.y,dt,ks,kc);
+
+    // ----- pés (no chão; levantam ao andar, ao puxar o fio do joelho e no voo) -----
+    let al={x:J.AL.x-q*30,y:J.AL.y}, ar={x:J.AR.x+q*30,y:J.AR.y};
+    al.x+=step1*24*Wk; al.y-=Math.max(0,Math.cos(ph))*36*Wk;
+    ar.x-=step1*24*Wk; ar.y-=Math.max(0,-Math.cos(ph))*36*Wk;
+    mix(al,318,742,PZ.fly); mix(ar,470,730,PZ.fly);
+    al.y+=Math.sin(tt*3.2)*10*PZ.fly; ar.y+=Math.sin(tt*3.2+1.4)*10*PZ.fly;
+    al.x+=r1.x*.35; al.y+=Math.min(0,r1.y)*.8; ar.x+=r3.x*.35; ar.y+=Math.min(0,r3.y)*.8;
+    al.x+=B.root.x; ar.x+=B.root.x;
+    B.al.x-=mvX*.25*PZ.fly;B.ar.x-=mvX*.25*PZ.fly;
+    spring(B.al,al.x,al.y,dt,220,22); spring(B.ar,ar.x,ar.y,dt,220,22);
+    pose();
+
+    R.capeV=mvX;
     spinGesture(t,dt,cam);
     if(!RM&&Math.random()<dt*(2+E*26))pulses.push({i:(Math.random()*5)|0,p:0,v:.7+Math.random()*.9});
     for(let j=pulses.length-1;j>=0;j--){pulses[j].p+=pulses[j].v*dt*(1+E*1.5);if(pulses[j].p>1)pulses.splice(j,1)}
@@ -212,12 +287,12 @@
     const tt=t/1000; cx.clearRect(0,0,W,H);
     if(!camOn){cx.fillStyle='rgba(255,255,255,.035)';const gs=34*S;for(let x=(tt*6)%gs;x<W;x+=gs)for(let y=0;y<H;y+=gs)cx.fillRect(x,y,1.2,1.2)}
     drawMascot();
-    const att=[warp(CT.lh.x,CT.lh.y),warp(CT.lk.x,CT.lk.y),warp(CROWN.x,CROWN.y),warp(CT.rk.x,CT.rk.y),warp(CT.rh.x,CT.rh.y)];
+    const att=ATT.map((p,i)=>warpW(p,ATTW[i]));
     cx.globalCompositeOperation='lighter';
     // olhos e logo acendem com o trabalho
     const fr=Math.max(0,Math.cos(R.spin)), pe=(.3+.3*E+.08*Math.sin(tt*5))*fr;
-    EYES.forEach(e=>glow(warp(e.x,e.y),36*K,'rgba(255,220,90,'+pe.toFixed(2)+')','rgba(255,200,60,0)'));
-    glow(warp(LOGO.x,LOGO.y),60*K,'rgba(124,255,57,'+((.1+.25*E)*fr).toFixed(2)+')','rgba(124,255,57,0)');
+    EYES.forEach((e,i)=>glow(warpW(e,EYEW[i]),36*K,'rgba(255,220,90,'+pe.toFixed(2)+')','rgba(255,200,60,0)'));
+    glow(warpW(LOGO,LOGOW),60*K,'rgba(124,255,57,'+((.1+.25*E)*fr).toFixed(2)+')','rgba(124,255,57,0)');
     // fios dourados
     cx.lineCap='round';
     fing.forEach((a,i)=>{const b=att[i],c=bez(a,b,i,tt);
