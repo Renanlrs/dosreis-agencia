@@ -766,6 +766,43 @@
   .rv{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
   .rv.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.rv,.word{opacity:1;transform:none}}
+  /* ===== MARIONETE (agentes) ===== */
+  .pup-head{text-align:center;max-width:680px;margin:clamp(70px,10vh,120px) auto 30px}
+  .pup-head .body{margin-top:14px}
+  .pup-title{font-size:clamp(28px,4.2vw,50px);font-weight:200;line-height:1.08;letter-spacing:-.02em;margin-top:14px}
+  .pup{position:relative;height:clamp(420px,62vh,600px);border:1px solid var(--line);border-radius:26px;overflow:hidden;
+       background:radial-gradient(120% 90% at 30% 40%,#14160f 0%,#070807 55%,#000 100%);touch-action:pan-y;cursor:none;isolation:isolate}
+  .pup::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+       background:radial-gradient(70% 60% at 50% 50%,transparent 55%,rgba(0,0,0,.7));z-index:3}
+  .pup-cv{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+  .pup-hud{position:absolute;z-index:4;left:0;top:0;transform:translate(-50%,-100%);font:600 10.5px/1.5 ui-monospace,'SFMono-Regular',Consolas,monospace;
+       color:#ff9a3c;letter-spacing:.08em;padding:8px 11px;border:1px solid rgba(255,154,60,.55);border-radius:4px;
+       background:rgba(20,10,4,.55);backdrop-filter:blur(4px);box-shadow:0 0 18px rgba(255,140,40,.18);white-space:nowrap;pointer-events:none}
+  .pup-hud b{color:#ffb36b}.pup-hud span{color:#fff}
+  .pup-hud em{font-style:normal;color:var(--green);text-shadow:0 0 10px var(--glow)}
+  .pup-hud.busy em{color:#ffcf7a;text-shadow:0 0 10px rgba(255,170,60,.7)}
+  .pup-bar{height:3px;margin-top:6px;background:rgba(255,154,60,.18);border-radius:2px;overflow:hidden}
+  .pup-bar i{display:block;height:100%;width:8%;background:linear-gradient(90deg,#ff9a3c,#ffd28a);transition:width .25s}
+  .pup-term{position:absolute;z-index:4;right:clamp(12px,3vw,34px);top:clamp(14px,4vh,34px);width:min(400px,44%);
+       font:400 11.5px/1.6 ui-monospace,'SFMono-Regular',Consolas,monospace;color:#e9efe6;padding:12px 14px;
+       border:1px solid rgba(255,255,255,.55);border-radius:3px;background:rgba(6,8,6,.72);backdrop-filter:blur(6px);pointer-events:none}
+  .pup-term-top{color:#ff9a3c}.pup-term-top b{color:#fff;font-weight:600;float:right}
+  .pup-term-sub{display:flex;justify-content:space-between;color:#cfd6cb}
+  .pup-term-st{color:#fff;border-bottom:1px solid rgba(255,255,255,.25);padding-bottom:6px;margin-bottom:6px}
+  .pup-term-wait{color:var(--green)}
+  .pup-log{height:13.5em;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+  .pup-log div{flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:pupIn .35s var(--ease)}
+  .pup-log .i{color:#ff9a3c}.pup-log .d{color:var(--green)}.pup-log .r{color:#cfd6cb}
+  @keyframes pupIn{from{opacity:0;transform:translateY(6px)}}
+  .pup-tip{position:absolute;z-index:4;left:50%;bottom:16px;transform:translateX(-50%);font-size:10.5px;letter-spacing:.24em;
+       text-transform:uppercase;color:var(--fg3);transition:opacity .6s;pointer-events:none}
+  .pup.on .pup-tip{opacity:0}
+  .pt-m{display:none}@media(hover:none){.pt-d{display:none}.pt-m{display:inline}}
+  @media(max-width:760px){
+    .pup{height:620px;cursor:auto}
+    .pup-term{left:12px;right:12px;width:auto;top:auto;bottom:44px;font-size:10.5px}
+    .pup-log{height:8em}
+  }
 </style>
 </head>
 <body>
@@ -1223,6 +1260,28 @@ Tiago Ferreira</textarea>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20o%20Torres%20Viana%20ERP." target="_blank" rel="noopener">Quero uma demonstração</a></article>
     <article class="sist rv"><span class="sig">LI</span><span class="tg">Frete e entrega sob controle</span><h3>Logística Inteligente</h3><p>Cotação de frete, ordem de coleta, frota própria, rastreio por GPS e torre de controle das entregas.</p><ul><li>Transportadora</li><li>Distribuidora de bebidas</li><li>Quem entrega todo dia</li></ul>
       <a class="btn line" href="https://wa.me/5519988013439?text=Quero%20ver%20a%20Log%C3%ADstica%20Inteligente." target="_blank" rel="noopener">Quero uma demonstração</a></article>
+  </div>
+
+  <!-- ===== MARIONETE: agentes de IA trabalhando dentro do sistema ===== -->
+  <div class="pup-head rv">
+    <span class="kicker">IA dentro do sistema</span>
+    <h3 class="pup-title">Você dá o comando.<br><span class="gl">Os agentes fazem o trabalho.</span></h3>
+    <p class="body">Estoque, nota, cobrança e atendimento rodando sozinhos enquanto você cuida do que importa. Mexa o mouse — ou o dedo — e conduza o agente.</p>
+  </div>
+  <div class="pup rv" id="pup" aria-label="Animação: agente de IA conduzido por fios, trabalhando nas tarefas do ERP">
+    <canvas class="pup-cv"></canvas>
+    <div class="pup-hud" aria-hidden="true">
+      <div class="pup-hud-l"><b>AGENTE</b> · <span>JÚLIA-01</span></div>
+      <div class="pup-hud-l">STATUS: <em class="pup-st">OCIOSA</em></div>
+      <div class="pup-bar"><i></i></div>
+    </div>
+    <div class="pup-term" aria-hidden="true">
+      <div class="pup-term-top"><span>dosreis@erp</span> <b>agente --acompanhar</b></div>
+      <div class="pup-term-sub"><span>[ok] mão rastreada</span> <span>agente JÚLIA-01</span></div>
+      <div class="pup-term-st">[<span class="pup-term-wait">aguardando comando</span>]</div>
+      <div class="pup-log"></div>
+    </div>
+    <span class="pup-tip"><span class="pt-d">mexa o cursor aqui</span><span class="pt-m">arraste o dedo aqui</span></span>
   </div>
 </div>
 
@@ -1908,5 +1967,6 @@ Tiago Ferreira</textarea>
   });
 })();
 </script>
+<script src="assets/js/marionete.js" defer></script>
 </body>
 </html>
